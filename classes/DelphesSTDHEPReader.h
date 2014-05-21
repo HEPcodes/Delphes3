@@ -6,8 +6,8 @@
  *  Reads STDHEP file
  *
  *
- *  $Date: 2013-05-30 00:47:35 +0200 (Thu, 30 May 2013) $
- *  $Revision: 1129 $
+ *  $Date: 2014-04-22 12:11:37 +0200 (Tue, 22 Apr 2014) $
+ *  $Revision: 1388 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -67,7 +67,7 @@ private:
 
   void ReadFileHeader();
   void ReadEventTable();
-  void ReadSTDHEPHeader(bool skipNTuples);
+  void ReadEventHeader();
   void ReadSTDCM1();
   void ReadSTDHEP();
   void ReadSTDHEP4();
