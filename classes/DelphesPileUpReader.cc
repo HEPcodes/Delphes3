@@ -4,8 +4,8 @@
  *  Reads pile-up binary file
  *
  *
- *  $Date: 2013-03-08 09:25:30 +0100 (Fri, 08 Mar 2013) $
- *  $Revision: 1046 $
+ *  $Date: 2014-05-06 11:29:55 +0200 (Tue, 06 May 2014) $
+ *  $Revision: 1394 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -56,7 +56,7 @@ DelphesPileUpReader::DelphesPileUpReader(const char *fileName) :
   xdrstdio_create(fInputXDR, fPileUpFile, XDR_DECODE);
 
   // read number of events
-  fseek(fPileUpFile, -8, SEEK_END);
+  fseeko(fPileUpFile, -8, SEEK_END);
   xdr_hyper(fInputXDR, &fEntries);
 
   if(fEntries >= kIndexSize)
@@ -66,7 +66,7 @@ DelphesPileUpReader::DelphesPileUpReader(const char *fileName) :
   }
 
   // read index of events
-  fseek(fPileUpFile, -8 - 8*fEntries, SEEK_END);
+  fseeko(fPileUpFile, -8 - 8*fEntries, SEEK_END);
   xdr_opaque(fInputXDR, fIndex, fEntries*8);
 }
 
@@ -121,7 +121,7 @@ bool DelphesPileUpReader::ReadEntry(quad_t entry)
   xdr_hyper(fIndexXDR, &offset);
 
   // read event
-  fseek(fPileUpFile, offset, SEEK_SET);
+  fseeko(fPileUpFile, offset, SEEK_SET);
   xdr_int(fInputXDR, &fEntrySize);
 
   if(fEntrySize >= kBufferSize)
