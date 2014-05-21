@@ -20,15 +20,15 @@
 // along with this program; if not, write to the Free Software               //
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA //
 //                                                                           //
-// $Revision:: 859                                                          $//
-// $Date:: 2012-11-28 02:49:23 +0100 (Wed, 28 Nov 2012)                     $//
+// $Revision:: 1332                                                         $//
+// $Date:: 2013-11-20 21:52:59 +0100 (Wed, 20 Nov 2013)                     $//
 ///////////////////////////////////////////////////////////////////////////////
 
 //#ifdef HAVE_CONFIG_H
 #include "config.h"
 //#else
 //#define PACKAGE_NAME "SISCone"
-//#define VERSION "1.4.0-devel"
+//#define VERSION "2.0.6"
 //#warning "No config.h file available, using preset values"
 //#endif
 

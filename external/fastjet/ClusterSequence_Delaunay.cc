@@ -1,5 +1,5 @@
 //STARTHEADER
-// $Id: ClusterSequence_Delaunay.cc 859 2012-11-28 01:49:23Z pavel $
+// $Id: ClusterSequence_Delaunay.cc 1332 2013-11-20 20:52:59Z pavel $
 //
 // Copyright (c) 2005-2011, Matteo Cacciari, Gavin P. Salam and Gregory Soyez
 //
@@ -30,6 +30,7 @@
 #include "fastjet/Error.hh"
 #include "fastjet/PseudoJet.hh"
 #include "fastjet/ClusterSequence.hh"
+#include "fastjet/internal/DynamicNearestNeighbours.hh"
 #include<iostream>
 #include<sstream>
 #include<cmath>

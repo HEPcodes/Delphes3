@@ -1,17 +1,17 @@
 
-/** \class EnergyScale
+/** \class TimeSmearing
  *
- *  Applies energy scale.
+ *  Performs transverse momentum resolution smearing.
  *
- *  $Date: 2013-11-21 11:38:22 +0100 (Thu, 21 Nov 2013) $
- *  $Revision: 1338 $
+ *  $Date: 2013-02-13 16:58:53 +0100 (Wed, 13 Feb 2013) $
+ *  $Revision: 911 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
  *
  */
 
-#include "modules/EnergyScale.h"
+#include "modules/TimeSmearing.h"
 
 #include "classes/DelphesClasses.h"
 #include "classes/DelphesFactory.h"
@@ -38,64 +38,64 @@ using namespace std;
 
 //------------------------------------------------------------------------------
 
-EnergyScale::EnergyScale() :
-  fFormula(0), fItInputArray(0)
+TimeSmearing::TimeSmearing() :
+fItInputArray(0)
 {
-  fFormula = new DelphesFormula;
 }
 
 //------------------------------------------------------------------------------
 
-EnergyScale::~EnergyScale()
+TimeSmearing::~TimeSmearing()
 {
-  if(fFormula) delete fFormula;
 }
 
 //------------------------------------------------------------------------------
 
-void EnergyScale::Init()
+void TimeSmearing::Init()
 {
   // read resolution formula
 
-  fFormula->Compile(GetString("ScaleFormula", "0.0"));
-
+  fTimeResolution = GetDouble("TimeResolution", 1.0E-10);
   // import input array
 
-  fInputArray = ImportArray(GetString("InputArray", "FastJetFinder/jets"));
+  fInputArray = ImportArray(GetString("InputArray", "MuonMomentumSmearing/muons"));
   fItInputArray = fInputArray->MakeIterator();
 
   // create output array
 
-  fOutputArray = ExportArray(GetString("OutputArray", "jets"));
+  fOutputArray = ExportArray(GetString("OutputArray", "muons"));
 }
 
 //------------------------------------------------------------------------------
 
-void EnergyScale::Finish()
+void TimeSmearing::Finish()
 {
   if(fItInputArray) delete fItInputArray;
 }
 
 //------------------------------------------------------------------------------
 
-void EnergyScale::Process()
+void TimeSmearing::Process()
 {
-  Candidate *candidate;
-  TLorentzVector momentum;
-  Double_t scale;
+  Candidate *candidate, *mother;
+  Double_t t;
+  const Double_t c_light = 2.99792458E8;
   
   fItInputArray->Reset();
   while((candidate = static_cast<Candidate*>(fItInputArray->Next())))
   {
-    momentum = candidate->Momentum;
-
-    scale = fFormula->Eval(momentum.Pt(), momentum.Eta());
-
-    if(scale > 0.0) momentum *= scale;
-
+    const TLorentzVector &candidatePosition = candidate->Position;
+    t = candidatePosition.T()*1.0E-3/c_light;
+    
+    // apply smearing formula
+    t = gRandom->Gaus(t, fTimeResolution);
+   
+    mother = candidate;
     candidate = static_cast<Candidate*>(candidate->Clone());
-    candidate->Momentum = momentum;
-
+    candidate->Position.SetT(t*1.0E3*c_light);
+    
+    candidate->AddCandidate(mother);
+        
     fOutputArray->Add(candidate);
   }
 }

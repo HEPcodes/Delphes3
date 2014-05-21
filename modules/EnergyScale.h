@@ -1,12 +1,12 @@
 #ifndef EnergyScale_h
 #define EnergyScale_h
 
-/** \class MomentumSmearing
+/** \class EnergyScale
  *
- *  Performs transverse momentum resolution smearing.
+ *  Applies energy scale.
  *
- *  $Date: 2013-06-25 14:42:33 +0200 (Tue, 25 Jun 2013) $
- *  $Revision: 1141 $
+ *  $Date: 2013-11-21 11:38:22 +0100 (Thu, 21 Nov 2013) $
+ *  $Revision: 1338 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve

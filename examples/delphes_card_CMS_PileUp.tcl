@@ -24,6 +24,7 @@ set ExecutionPath {
 
   Rho
   FastJetFinder
+  PileUpJetID
   JetPileUpSubtractor
 
   JetEnergyScale
@@ -60,12 +61,27 @@ module PileUpMerger PileUpMerger {
   set VertexOutputArray vertices
 
   # pre-generated minbias input file
-  set PileUpFile MinBias.pileup
+  set PileUpFile ../../Delphes/MinBias.pileup
 
   # average expected pile up
-  set MeanPileUp 50
-  # spread in the beam direction in m (assumes gaussian)
-  set ZVertexSpread 0.07
+  set MeanPileUp 10
+  
+  # maximum spread in the beam direction in m 
+  set ZVertexSpread 0.10
+  
+  # maximum spread in time in s
+  set TVertexSpread 1.5E-09
+
+  # vertex smearing formula f(z,t) (z,t need to be respectively given in m,s)
+  
+  set VertexDistributionFormula {exp(-(t^2/(2*(0.05/2.99792458E8*exp(-(z^2/(2*(0.05)^2))))^2)))}
+
+  #set VertexDistributionFormula { (abs(t) <= 1.0e-09) * (abs(z) <= 0.15) * (1.00) + \
+  #                                (abs(t) >  1.0e-09) * (abs(z) <= 0.15) * (0.00) + \
+  #				  (abs(t) <= 1.0e-09) * (abs(z) > 0.15)  * (0.00) + \
+  #				  (abs(t) >  1.0e-09) * (abs(z) > 0.15)  * (0.00)}
+
+
 }
 
 #################################
@@ -309,7 +325,8 @@ module TrackPileUpSubtractor TrackPileUpSubtractor {
   add InputArray Calorimeter/eflowTracks eflowTracks
   add InputArray ElectronEnergySmearing/electrons electrons
   add InputArray MuonMomentumSmearing/muons muons
-
+  
+  set VertexInputArray PileUpMerger/vertices
   # assume perfect pile-up subtraction for tracks with |z| > fZVertexResolution
   # Z vertex resolution in m
   set ZVertexResolution 0.0001
@@ -388,11 +405,33 @@ module FastJetFinder FastJetFinder {
 }
 
 ###########################
+# Jet Pile-Up ID
+###########################
+
+module PileUpJetID PileUpJetID {
+  set JetInputArray FastJetFinder/jets
+  set TrackInputArray Calorimeter/eflowTracks
+  set NeutralInputArray Calorimeter/eflowTowers
+
+  set VertexInputArray PileUpMerger/vertices
+  # assume perfect pile-up subtraction for tracks with |z| > fZVertexResolution
+  # Z vertex resolution in m
+  set ZVertexResolution 0.0001
+  
+  set OutputArray jets
+
+  set UseConstituents 0
+  set ParameterR 0.5
+
+  set JetPTMin 20.0
+}
+
+###########################
 # Jet Pile-Up Subtraction
 ###########################
 
 module JetPileUpSubtractor JetPileUpSubtractor {
-  set JetInputArray FastJetFinder/jets
+  set JetInputArray PileUpJetID/jets
   set RhoInputArray Rho/rho
 
   set OutputArray jets

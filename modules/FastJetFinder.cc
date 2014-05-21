@@ -3,8 +3,8 @@
  *
  *  Finds jets using FastJet library.
  *
- *  $Date: 2013-11-04 11:59:27 +0100 (Mon, 04 Nov 2013) $
- *  $Revision: 1315 $
+ *  $Date: 2013-12-21 15:00:11 +0100 (Sat, 21 Dec 2013) $
+ *  $Revision: 1345 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -93,7 +93,7 @@ void FastJetFinder::Init()
   fMaxIterations = GetInt("MaxIterations", 100);
   fMaxPairSize = GetInt("MaxPairSize", 2);
   fIratch = GetInt("Iratch", 1);
-  fAdjacencyCut = GetDouble("AdjacencyCut", 2.0);
+  fAdjacencyCut = GetInt("AdjacencyCut", 2);
   fOverlapThreshold = GetDouble("OverlapThreshold", 0.75);
 
   fJetPTMin = GetDouble("JetPTMin", 10.0);
@@ -192,6 +192,7 @@ void FastJetFinder::Process()
   Candidate *candidate, *constituent;
   TLorentzVector momentum;
   Double_t deta, dphi, detaMax, dphiMax;
+  Double_t time, weightTime, avTime;
   Int_t number;
   Double_t rho = 0;
   PseudoJet jet, area;
@@ -258,6 +259,9 @@ void FastJetFinder::Process()
 
     candidate = factory->NewCandidate();
 
+    time=0;
+    weightTime=0;
+
     inputList.clear();
     inputList = sequence->constituents(*itOutputList);
     for(itInputList = inputList.begin(); itInputList != inputList.end(); ++itInputList)
@@ -268,11 +272,17 @@ void FastJetFinder::Process()
       dphi = TMath::Abs(momentum.DeltaPhi(constituent->Momentum));
       if(deta > detaMax) detaMax = deta;
       if(dphi > dphiMax) dphiMax = dphi;
-
+      
+      time += TMath::Sqrt(constituent->Momentum.E())*(constituent->Position.T());
+      weightTime += TMath::Sqrt(constituent->Momentum.E());
+    
       candidate->AddCandidate(constituent);
     }
+   
+    avTime = time/weightTime;
 
     candidate->Momentum = momentum;
+    candidate->Position.SetT(avTime);
     candidate->Area.SetPxPyPzE(area.px(), area.py(), area.pz(), area.E());
 
     candidate->DeltaEta = detaMax;

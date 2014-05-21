@@ -3,8 +3,8 @@
  *
  *  Subtract pile-up contribution from tracks.
  *
- *  $Date: 2013-11-04 11:21:27 +0100 (Mon, 04 Nov 2013) $
- *  $Revision: 1314 $
+ *  $Date: 2014-01-17 14:29:22 +0100 (Fri, 17 Jan 2014) $
+ *  $Revision: 1349 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -52,6 +52,11 @@ TrackPileUpSubtractor::~TrackPileUpSubtractor()
 
 void TrackPileUpSubtractor::Init()
 {
+// import input array
+
+  fVertexInputArray = ImportArray(GetString("VertexInputArray", "PileUpMerger/vertices"));
+  fItVertexInputArray = fVertexInputArray->MakeIterator();
+  
   fZVertexResolution  = GetDouble("ZVertexResolution", 0.005)*1.0E3;
 
   // import arrays with output from other modules
@@ -84,6 +89,8 @@ void TrackPileUpSubtractor::Finish()
 
     if(iterator) delete iterator;
   }
+
+  if(fItVertexInputArray) delete fItVertexInputArray;
 }
 
 //------------------------------------------------------------------------------
@@ -94,7 +101,20 @@ void TrackPileUpSubtractor::Process()
   map< TIterator *, TObjArray * >::iterator itInputMap;
   TIterator *iterator;
   TObjArray *array;
-  Double_t z;
+  Double_t z, zvtx=0;
+
+  
+  // find z position of primary vertex
+  
+  fItVertexInputArray->Reset();
+  while((candidate = static_cast<Candidate*>(fItVertexInputArray->Next())))
+  {
+    if(!candidate->IsPU)
+    {
+    zvtx = candidate->Position.Z();
+    // break;
+    }
+  }
 
   // loop over all input arrays
   for(itInputMap = fInputMap.begin(); itInputMap != fInputMap.end(); ++itInputMap)
@@ -108,10 +128,11 @@ void TrackPileUpSubtractor::Process()
     {
       particle = static_cast<Candidate*>(candidate->GetCandidates()->At(0));
       z = particle->Position.Z();
-
+      
       // apply pile-up subtraction
       // assume perfect pile-up subtraction for tracks outside fZVertexResolution
-      if(candidate->IsPU && TMath::Abs(z) > fZVertexResolution) continue;
+      
+      if(candidate->IsPU && TMath::Abs(z-zvtx) > fZVertexResolution) continue;
 
       array->Add(candidate);
     }

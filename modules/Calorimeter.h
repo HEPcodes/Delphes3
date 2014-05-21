@@ -6,8 +6,8 @@
  *  Fills calorimeter towers, performs calorimeter resolution smearing,
  *  preselects towers hit by photons and creates energy flow objects.
  *
- *  $Date: 2013-09-03 17:54:56 +0200 (Tue, 03 Sep 2013) $
- *  $Revision: 1273 $
+ *  $Date: 2013-12-21 15:00:11 +0100 (Sat, 21 Dec 2013) $
+ *  $Revision: 1345 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -44,6 +44,13 @@ private:
   Double_t fTowerEta, fTowerPhi, fTowerEdges[4];
   Double_t fTowerECalEnergy, fTowerHCalEnergy;
   Double_t fTrackECalEnergy, fTrackHCalEnergy;
+  
+  Double_t fTowerECalTime, fTowerHCalTime;
+  Double_t fTrackECalTime, fTrackHCalTime;
+   
+  Double_t fTowerECalWeightTime, fTowerHCalWeightTime;
+  Double_t fTrackECalWeightTime, fTrackHCalWeightTime;
+  
   Int_t fTowerTrackHits, fTowerPhotonHits;
 
   TFractionMap fFractionMap; //!

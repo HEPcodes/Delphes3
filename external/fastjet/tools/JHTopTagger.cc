@@ -1,5 +1,5 @@
 //STARTHEADER
-// $Id: JHTopTagger.cc 999 2013-03-04 11:48:06Z pavel $
+// $Id: JHTopTagger.cc 1332 2013-11-20 20:52:59Z pavel $
 //
 // Copyright (c) 2005-2011, Matteo Cacciari, Gavin P. Salam and Gregory Soyez
 //
@@ -67,7 +67,7 @@ PseudoJet JHTopTagger::result(const PseudoJet & jet) const{
 
   // warn if the jet has not been clustered with a Cambridge/Aachen
   // algorithm
-  if (! jet.validated_cs()->jet_def().jet_algorithm() == cambridge_algorithm)
+  if (jet.validated_cs()->jet_def().jet_algorithm() != cambridge_algorithm)
     _warnings_nonca.warn("JHTopTagger should only be applied on jets from a Cambridge/Aachen clustering; use it with other algorithms at your own risk.");
 
 

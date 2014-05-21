@@ -1,5 +1,5 @@
 //STARTHEADER
-// $Id: MassDropTagger.cc 999 2013-03-04 11:48:06Z pavel $
+// $Id: MassDropTagger.cc 1332 2013-11-20 20:52:59Z pavel $
 //
 // Copyright (c) 2005-2011, Matteo Cacciari, Gavin P. Salam and Gregory Soyez
 //
@@ -57,7 +57,7 @@ PseudoJet MassDropTagger::result(const PseudoJet & jet) const{
   // issue a warning if the jet is not obtained through a C/A
   // clustering
   if ((! j.has_associated_cluster_sequence()) ||
-      (! j.validated_cs()->jet_def().jet_algorithm() == cambridge_algorithm))
+      (j.validated_cs()->jet_def().jet_algorithm() != cambridge_algorithm))
     _warnings_nonca.warn("MassDropTagger should only be applied on jets from a Cambridge/Aachen clustering; use it with other algorithms at your own risk.");
 
 

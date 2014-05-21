@@ -1,5 +1,5 @@
 //STARTHEADER
-// $Id: ClosestPair2D.cc 859 2012-11-28 01:49:23Z pavel $
+// $Id: ClosestPair2D.cc 1332 2013-11-20 20:52:59Z pavel $
 //
 // Copyright (c) 2005-2011, Matteo Cacciari, Gavin P. Salam and Gregory Soyez
 //
@@ -182,7 +182,7 @@ void ClosestPair2D::closest_pair(unsigned int & ID1, unsigned int & ID2,
   ID1 = _heap->minloc();
   ID2 = _ID(_points[ID1].neighbour);
   distance2 = _points[ID1].neighbour_dist2;
-  if (ID1 > ID2) swap(ID1,ID2);
+  if (ID1 > ID2) std::swap(ID1,ID2);
 }
 
 

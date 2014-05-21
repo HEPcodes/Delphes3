@@ -5,8 +5,8 @@
  *
  *  Subtract pile-up contribution from tracks.
  *
- *  $Date: 2013-03-24 15:08:05 +0100 (Sun, 24 Mar 2013) $
- *  $Revision: 1069 $
+ *  $Date: 2013-12-21 15:00:11 +0100 (Sat, 21 Dec 2013) $
+ *  $Revision: 1345 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -38,6 +38,11 @@ private:
   std::map< TIterator *, TObjArray * > fInputMap; //!
 
   ClassDef(TrackPileUpSubtractor, 1)
+
+  TIterator *fItVertexInputArray; //!
+
+  const TObjArray *fVertexInputArray; //!
+
 };
 
 #endif

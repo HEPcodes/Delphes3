@@ -5,8 +5,8 @@
  *
  *  Finds jets using FastJet library.
  *
- *  $Date: 2013-11-04 11:59:27 +0100 (Mon, 04 Nov 2013) $
- *  $Revision: 1315 $
+ *  $Date: 2013-11-20 22:26:11 +0100 (Wed, 20 Nov 2013) $
+ *  $Revision: 1337 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -51,7 +51,7 @@ private:
   Int_t fMaxIterations;
   Int_t fMaxPairSize;
   Int_t fIratch;
-  Double_t fAdjacencyCut;
+  Int_t fAdjacencyCut;
   Double_t fOverlapThreshold;
 
   // --- FastJet Area method --------

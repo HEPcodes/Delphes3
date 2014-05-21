@@ -3,8 +3,8 @@
  *
  *  Lists classes to be included in cint dicitonary
  *
- *  $Date: 2013-07-04 13:19:15 +0200 (Thu, 04 Jul 2013) $
- *  $Revision: 1177 $
+ *  $Date: 2014-01-03 16:41:28 +0100 (Fri, 03 Jan 2014) $
+ *  $Revision: 1348 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -18,6 +18,7 @@
 #include "modules/Efficiency.h"
 #include "modules/EnergySmearing.h"
 #include "modules/MomentumSmearing.h"
+#include "modules/TimeSmearing.h"
 #include "modules/Calorimeter.h"
 #include "modules/Isolation.h"
 #include "modules/EnergyScale.h"
@@ -30,6 +31,7 @@
 #include "modules/PileUpMerger.h"
 #include "modules/JetPileUpSubtractor.h"
 #include "modules/TrackPileUpSubtractor.h"
+#include "modules/PileUpJetID.h"
 #include "modules/ConstituentFilter.h"
 #include "modules/StatusPidFilter.h"
 #include "modules/Cloner.h"
@@ -49,6 +51,7 @@
 #pragma link C++ class Efficiency+;
 #pragma link C++ class EnergySmearing+;
 #pragma link C++ class MomentumSmearing+;
+#pragma link C++ class TimeSmearing+;
 #pragma link C++ class Calorimeter+;
 #pragma link C++ class Isolation+;
 #pragma link C++ class EnergyScale+;
@@ -61,6 +64,7 @@
 #pragma link C++ class PileUpMerger+;
 #pragma link C++ class JetPileUpSubtractor+;
 #pragma link C++ class TrackPileUpSubtractor+;
+#pragma link C++ class PileUpJetID+;
 #pragma link C++ class ConstituentFilter+;
 #pragma link C++ class StatusPidFilter+;
 #pragma link C++ class Cloner+;

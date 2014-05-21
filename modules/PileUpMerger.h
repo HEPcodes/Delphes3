@@ -18,6 +18,7 @@
 
 class TObjArray;
 class DelphesPileUpReader;
+class DelphesTF2;
 
 class PileUpMerger: public DelphesModule
 {
@@ -34,9 +35,13 @@ private:
 
   Int_t fPileUpDistribution;
   Double_t fMeanPileUp;
-  Double_t fZVertexSpread;
 
-  DelphesPileUpReader *fReader;
+  Double_t fZVertexSpread;
+  Double_t fTVertexSpread;
+
+  DelphesTF2 *fFunction; //!
+
+  DelphesPileUpReader *fReader; //!
 
   TIterator *fItInputArray; //!
 
