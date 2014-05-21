@@ -5,8 +5,8 @@
  *
  *  Finds jets using FastJet library.
  *
- *  $Date: 2013-11-20 22:26:11 +0100 (Wed, 20 Nov 2013) $
- *  $Revision: 1337 $
+ *  $Date: 2014-04-17 12:28:09 +0200 (Thu, 17 Apr 2014) $
+ *  $Revision: 1383 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -24,6 +24,9 @@ namespace fastjet {
   class JetDefinition;
   class AreaDefinition;
   class Selector;
+  namespace contrib {
+    class NjettinessPlugin;
+  }
 }
 
 class FastJetFinder: public DelphesModule
@@ -40,6 +43,9 @@ public:
 private:
 
   void *fPlugin; //!
+  void *fRecomb; //!
+  fastjet::contrib::NjettinessPlugin *fNjettinessPlugin; //!
+
   fastjet::JetDefinition *fDefinition; //!
 
   Int_t fJetAlgorithm;
@@ -53,6 +59,14 @@ private:
   Int_t fIratch;
   Int_t fAdjacencyCut;
   Double_t fOverlapThreshold;
+
+  //-- N (sub)jettiness parameters --
+
+  Bool_t fComputeNsubjettiness;
+  Double_t fBeta;
+  Int_t fAxisMode;
+  Double_t fRcutOff;
+  Int_t fN ;
 
   // --- FastJet Area method --------
 

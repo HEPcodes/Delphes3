@@ -25,6 +25,7 @@ CompBase *Muon::fgCompare = CompPT<Muon>::Instance();
 CompBase *Jet::fgCompare = CompPT<Jet>::Instance();
 CompBase *Track::fgCompare = CompPT<Track>::Instance();
 CompBase *Tower::fgCompare = CompE<Tower>::Instance();
+CompBase *HectorHit::fgCompare = CompE<HectorHit>::Instance();
 CompBase *Candidate::fgCompare = CompMomentumPt<Candidate>::Instance();
 
 //------------------------------------------------------------------------------
@@ -110,6 +111,7 @@ Candidate::Candidate() :
   Momentum(0.0, 0.0, 0.0, 0.0),
   Position(0.0, 0.0, 0.0, 0.0),
   Area(0.0, 0.0, 0.0, 0.0),
+  Dxy(0), SDxy(0), Xd(0), Yd(0), Zd(0),
   NCharged(0),
   NNeutrals(0),
   Beta(0),
@@ -128,6 +130,11 @@ Candidate::Candidate() :
   FracPt[2] = 0.0;
   FracPt[3] = 0.0;
   FracPt[4] = 0.0;
+  Tau[0] = 0.0;
+  Tau[1] = 0.0;
+  Tau[2] = 0.0;
+  Tau[3] = 0.0;
+  Tau[4] = 0.0;
 }
 
 //------------------------------------------------------------------------------
@@ -215,6 +222,11 @@ void Candidate::Copy(TObject &obj) const
   object.Momentum = Momentum;
   object.Position = Position;
   object.Area = Area;
+  object.Dxy = Dxy;
+  object.SDxy = SDxy;
+  object.Xd = Xd;
+  object.Yd = Yd;
+  object.Zd = Zd;
 
   object.NCharged = NCharged;
   object.NNeutrals = NNeutrals;
@@ -227,6 +239,11 @@ void Candidate::Copy(TObject &obj) const
   object.FracPt[2] = FracPt[2];
   object.FracPt[3] = FracPt[3];
   object.FracPt[4] = FracPt[4];
+  object.Tau[0] = Tau[0];
+  object.Tau[1] = Tau[1];
+  object.Tau[2] = Tau[2];
+  object.Tau[3] = Tau[3];
+  object.Tau[4] = Tau[4];
 
   object.fFactory = fFactory;
   object.fArray = 0;
@@ -268,7 +285,11 @@ void Candidate::Clear(Option_t* option)
   Momentum.SetXYZT(0.0, 0.0, 0.0, 0.0);
   Position.SetXYZT(0.0, 0.0, 0.0, 0.0);
   Area.SetXYZT(0.0, 0.0, 0.0, 0.0);
-
+  Dxy = 0.0;
+  SDxy = 0.0;
+  Xd = 0.0;
+  Yd = 0.0;
+  Zd = 0.0;
   NCharged = 0;
   NNeutrals = 0;
   Beta = 0.0;
@@ -280,6 +301,11 @@ void Candidate::Clear(Option_t* option)
   FracPt[2] = 0.0;
   FracPt[3] = 0.0;
   FracPt[4] = 0.0;
+  Tau[0] = 0.0;
+  Tau[1] = 0.0;
+  Tau[2] = 0.0;
+  Tau[3] = 0.0;
+  Tau[4] = 0.0;
 
   fArray = 0;
 }

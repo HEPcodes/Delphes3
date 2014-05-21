@@ -5,8 +5,8 @@
  *
  *  Fills ROOT tree branches.
  *
- *  $Date: 2013-11-08 17:09:58 +0100 (Fri, 08 Nov 2013) $
- *  $Revision: 1323 $
+ *  $Date: 2014-04-08 18:43:52 +0200 (Tue, 08 Apr 2014) $
+ *  $Revision: 1361 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -52,6 +52,7 @@ private:
   void ProcessScalarHT(ExRootTreeBranch *branch, TObjArray *array);
   void ProcessRho(ExRootTreeBranch *branch, TObjArray *array);
   void ProcessWeight(ExRootTreeBranch *branch, TObjArray *array);
+  void ProcessHectorHit(ExRootTreeBranch *branch, TObjArray *array);
 
 #ifndef __CINT__
   typedef void (TreeWriter::*TProcessMethod)(ExRootTreeBranch *, TObjArray *); //!

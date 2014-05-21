@@ -4,10 +4,10 @@
 /** \class Calorimeter
  *
  *  Fills calorimeter towers, performs calorimeter resolution smearing,
- *  preselects towers hit by photons and creates energy flow objects.
+ *  and creates energy flow objects (tracks, photons, and neutral hadrons).
  *
- *  $Date: 2013-12-21 15:00:11 +0100 (Sat, 21 Dec 2013) $
- *  $Revision: 1345 $
+ *  $Date: 2014-04-16 17:17:35 +0200 (Wed, 16 Apr 2014) $
+ *  $Revision: 1369 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -78,9 +78,10 @@ private:
 
   TObjArray *fTowerOutputArray; //!
   TObjArray *fPhotonOutputArray; //!
-
+ 
   TObjArray *fEFlowTrackOutputArray; //!
-  TObjArray *fEFlowTowerOutputArray; //!
+  TObjArray *fEFlowPhotonOutputArray; //!
+  TObjArray *fEFlowNeutralHadronOutputArray; //!
 
   TObjArray *fTowerTrackArray; //!
   TIterator *fItTowerTrackArray; //!

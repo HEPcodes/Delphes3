@@ -15,5 +15,6 @@ Note that the following packages are included as externals.
 
   * [ExRootAnalysis](https://cp3.irmp.ucl.ac.be/projects/ExRootAnalysis),
   * [FastJet](http://fastjet.fr/) by Cacciari, Salam and Soyez ([1111.6097](http://arxiv.org/abs/1111.6097)),
+  * [Hector](https://cp3.irmp.ucl.ac.be/projects/cp3admin/wiki/UsersPage/Physics/Hector) by J. de Favereau ([JINST **2** P09005](http://dx.doi.org/10.1088/1748-0221/2/09/P09005) [[arXiv:0707.1198](http://arxiv.org/abs/0707.1198)]),
   * [ProMC](http://atlaswww.hep.anl.gov/asc/promc/) by S. Chekanov et al. ([1306.6675](http://arxiv.org/abs/1306.6675), [1311.1229](http://arxiv.org/abs/1311.1229)),
   * subset (?) of [Tcl C API](http://wiki.tcl.tk/14054).
