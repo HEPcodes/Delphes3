@@ -24,6 +24,11 @@
 
 #include "classes/SortableObject.h"
 
+namespace fastjet {
+  class PseudoJet;
+}
+
+
 class DelphesFactory;
 
 //---------------------------------------------------------------------------
@@ -195,6 +200,7 @@ public:
   Float_t E; // photon energy
   
   Float_t EhadOverEem; // ratio of the hadronic versus electromagnetic energy deposited in the calorimeter
+  Float_t IsolationVar; 
 
   TRefArray Particles; // references to generated particles
 
@@ -219,6 +225,7 @@ public:
   Int_t Charge; // electron charge
 
   Float_t EhadOverEem; // ratio of the hadronic versus electromagnetic energy deposited in the calorimeter
+  Float_t IsolationVar; // Sum of chHadEt, NeutralHadEt, and  GammaEt
 
   TRef Particle; // reference to generated particle
 
@@ -241,6 +248,7 @@ public:
   Float_t Phi; // muon azimuthal angle
 
   Int_t Charge; // muon charge
+  Float_t IsolationVar; 
 
   TRef Particle; // reference to generated particle
 
@@ -266,6 +274,19 @@ public:
 
   Float_t DeltaEta;  // jet radius in pseudorapidity
   Float_t DeltaPhi;  // jet radius in azimuthal angle
+
+  UInt_t WTag;
+  UInt_t TopTag;
+  UInt_t HTag;
+
+  Float_t Tau1;
+  Float_t Tau2;
+  Float_t Tau3;
+
+  UInt_t NSubJets;
+  Float_t MassDrop;
+  Float_t TrimmedMass;
+
 
   UInt_t BTag; // 0 or 1 for a jet that has been tagged as containing a heavy quark
   UInt_t TauTag; // 0 or 1 for a jet that has been tagged as a tau
@@ -363,12 +384,26 @@ public:
   Int_t Charge;
 
   Float_t Mass;
+  Float_t IsolationVar;
+
   
   Int_t IsPU;
   Int_t IsConstituent;
   
   UInt_t BTag;
   UInt_t TauTag;
+
+  UInt_t WTag;
+  UInt_t TopTag;
+  UInt_t HTag;
+
+  Float_t Tau1;
+  Float_t Tau2;
+  Float_t Tau3;
+
+  UInt_t NSubJets;
+  Float_t MassDrop;
+  Float_t TrimmedMass;
 
   Float_t Eem;
   Float_t Ehad;

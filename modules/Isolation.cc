@@ -6,8 +6,8 @@
  *  to the candidate's transverse momentum. outputs candidates that have
  *  the transverse momenta fraction within (PTRatioMin, PTRatioMax].
  *
- *  $Date: 2013-08-19 15:40:54 +0200 (Mon, 19 Aug 2013) $
- *  $Revision: 1267 $
+ *  $Date: 2013-03-06 18:11:35 +0100 (Wed, 06 Mar 2013) $
+ *  $Revision: 1033 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -89,10 +89,6 @@ void Isolation::Init()
 
   fPTRatioMax = GetDouble("PTRatioMax", 0.1);
 
-  fPTSumMax = GetDouble("PTSumMax", 5.0);
-
-  fUsePTSum = GetBool("UsePTSum", false);
-
   fClassifier->fPTMin = GetDouble("PTMin", 0.5);
 
   // import input array(s)
@@ -135,7 +131,7 @@ void Isolation::Process()
 {
   Candidate *candidate, *isolation;
   TObjArray *isolationArray;
-  Double_t sum, ratio;
+  Double_t sumPT, ratio;
   Int_t counter;
   Double_t rho = 0.0;
 
@@ -160,7 +156,7 @@ void Isolation::Process()
     const TLorentzVector &candidateMomentum = candidate->Momentum;
 
     // loop over all input tracks
-    sum = 0.0;
+    sumPT = 0.0;
     counter = 0;
     itIsolationArray.Reset();
     while((isolation = static_cast<Candidate*>(itIsolationArray.Next())))
@@ -170,16 +166,17 @@ void Isolation::Process()
       if(candidateMomentum.DeltaR(isolationMomentum) <= fDeltaRMax &&
          !candidate->Overlaps(isolation))
       {
-        sum += isolationMomentum.Pt();
+        sumPT += isolationMomentum.Pt();
         ++counter;
       }
     }
 
-    // correct sum for pile-up contamination
-    sum = sum - rho*fDeltaRMax*fDeltaRMax*TMath::Pi();  
+    // correct sumPT for pile-up contamination
+    sumPT = sumPT - rho*fDeltaRMax*fDeltaRMax*TMath::Pi();  
 
-    ratio = sum/candidateMomentum.Pt();
-    if((fUsePTSum && sum > fPTSumMax) || ratio > fPTRatioMax) continue;
+    ratio = sumPT/candidateMomentum.Pt();
+    candidate->IsolationVar = ratio;
+    if(ratio > fPTRatioMax) continue;
 
     fOutputArray->Add(candidate);
   }

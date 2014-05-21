@@ -6,8 +6,8 @@
  *  its half-length, centered at (0,0,0) and with its axis
  *  oriented along the z-axis.
  *
- *  $Date: 2013-08-13 17:34:45 +0200 (Tue, 13 Aug 2013) $
- *  $Revision: 1248 $
+ *  $Date: 2013-02-12 15:13:59 +0100 (Tue, 12 Feb 2013) $
+ *  $Revision: 907 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -169,7 +169,7 @@ void ParticlePropagator::Process()
       mother = candidate;
       candidate = static_cast<Candidate*>(candidate->Clone());
 
-      candidate->Position.SetXYZT(x_t*1.0E3, y_t*1.0E3, z_t*1.0E3, candidatePosition.T() + t);
+      candidate->Position.SetXYZT(x_t*1.0E3, y_t*1.0E3, z_t*1.0E3, 0.0);
 
       candidate->Momentum = candidateMomentum;
       candidate->AddCandidate(mother);
@@ -263,7 +263,7 @@ void ParticlePropagator::Process()
         mother = candidate;
         candidate = static_cast<Candidate*>(candidate->Clone());
 
-        candidate->Position.SetXYZT(x_t*1.0E3, y_t*1.0E3, z_t*1.0E3, candidatePosition.T() + t);
+        candidate->Position.SetXYZT(x_t*1.0E3, y_t*1.0E3, z_t*1.0E3, 0.0);
 
         candidate->Momentum = candidateMomentum;
         candidate->AddCandidate(mother);

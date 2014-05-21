@@ -32,7 +32,6 @@ public:
 
 private:
 
-  Int_t fPileUpDistribution;
   Double_t fMeanPileUp;
   Double_t fZVertexSpread;
 

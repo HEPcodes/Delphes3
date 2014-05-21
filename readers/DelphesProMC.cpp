@@ -53,7 +53,7 @@ void ConvertInput(ProMCEvent &event, ExRootTreeBranch *branch, DelphesFactory *f
 
   Int_t pid, status;
   Double_t px, py, pz, mass;
-  Double_t x, y, z, t;
+  Double_t x, y, z;
 
   pdg = TDatabasePDG::Instance();
 
@@ -89,7 +89,7 @@ void ConvertInput(ProMCEvent &event, ExRootTreeBranch *branch, DelphesFactory *f
     pid = mutableParticles->pdg_id(i);
     status = mutableParticles->status(i);
     px = mutableParticles->px(i); py = mutableParticles->py(i); pz = mutableParticles->pz(i); mass = mutableParticles->mass(i);
-    x = mutableParticles->x(i); y = mutableParticles->y(i); z = mutableParticles->z(i); t = mutableParticles->t(i);
+    x = mutableParticles->x(i); y = mutableParticles->y(i); z = mutableParticles->z(i);
 
     candidate = factory->NewCandidate();
 
@@ -110,7 +110,7 @@ void ConvertInput(ProMCEvent &event, ExRootTreeBranch *branch, DelphesFactory *f
 
     candidate->Momentum.SetXYZM(px, py, pz, mass);
 
-    candidate->Position.SetXYZT(x, y, z, t);
+    candidate->Position.SetXYZT(x, y, z, 0.0);
 
     allParticleOutputArray->Add(candidate);
 
@@ -140,7 +140,7 @@ void SignalHandler(int sig)
 
 int main(int argc, char *argv[])
 {
-  char appName[] = "DelphesProMC";
+  char appName[] = "DelphesCMSFWLite";
   stringstream message;
   ProMCBook *inputFile = 0;
   TFile *outputFile = 0;
@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
         throw runtime_error(message.str());
       }
 
-      numberOfEvents = inputFile->getEvents();
+      numberOfEvents = inputFile->getEvents();;
 
       if(numberOfEvents <= 0) continue;
 

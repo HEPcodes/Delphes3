@@ -1,6 +1,13 @@
 [Delphes3](https://cp3.irmp.ucl.ac.be/projects/delphes) 
 =========
 
+This is, perhaps, the version used in [Snowmass Energy Frontier Simulations](http://www.snowmass2013.org/tiki-index.php?page=Energy_Frontier_FastSimulation).
+
+You can obtain this package via [the wiki page](http://www.snowmass2013.org/tiki-index.php?page=Energy_Frontier_FastSimulation), or directly from [http://red-gridftp11.unl.edu/Snowmass/SUSY/SnowmassProd.tgz](http://red-gridftp11.unl.edu/Snowmass/SUSY/SnowmassProd.tgz).
+
+ * [arXiv:1309.1057](http://arxiv.org/abs/1309.1057),
+ * [arXiv:1308.1636](http://arxiv.org/abs/1308.1636).
+
 ### Authors
 
    [The DelphesTeam](https://cp3.irmp.ucl.ac.be/projects/delphes/wiki/TheTeam)

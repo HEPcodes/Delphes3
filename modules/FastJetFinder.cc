@@ -8,6 +8,7 @@
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
+ *  \with modifications by J. Stupak and J. Dolen
  *
  */
 
@@ -41,10 +42,13 @@
 #include "fastjet/Selector.hh"
 #include "fastjet/ClusterSequenceArea.hh"
 #include "fastjet/tools/JetMedianBackgroundEstimator.hh"
+#include "fastjet/tools/Filter.hh"
 
 #include "fastjet/plugins/SISCone/fastjet/SISConePlugin.hh"
 #include "fastjet/plugins/CDFCones/fastjet/CDFMidPointPlugin.hh"
 #include "fastjet/plugins/CDFCones/fastjet/CDFJetCluPlugin.hh"
+
+#include "fastjet/tools/Njettiness.hh"
 
 using namespace std;
 using namespace fastjet;
@@ -261,6 +265,82 @@ void FastJetFinder::Process()
     candidate->DeltaEta = detaMax;
     candidate->DeltaPhi = dphiMax;
 
+    //-------------------------------------------------------------
+    // Jet sub-structure modifications by John Stupak and Jim Dolen
+    //--------------------------------------------------------------
+
+    if (itOutputList->perp()>200){
+
+	//------------------------------------
+	// Trimming
+	//------------------------------------
+
+	double Rtrim = 0.2;
+	double ptfrac = 0.05;
+	fastjet::Filter trimmer(fastjet::JetDefinition(fastjet::cambridge_algorithm, Rtrim), fastjet::SelectorPtFractionMin(ptfrac) );
+	fastjet::PseudoJet trimmed_jet = trimmer(*itOutputList);
+	
+	double trimmedMass=trimmed_jet.m();
+	if (trimmedMass<0) trimmedMass=0;
+	candidate->TrimmedMass=trimmedMass;
+
+	//------------------------------------
+	// Subjet Quantities
+	//------------------------------------
+
+	vector<PseudoJet> kept_subjets = trimmed_jet.pieces();
+	candidate->NSubJets=kept_subjets.size();
+
+	double largest_mass_subjet = 0;
+	for (size_t i = 0; i < kept_subjets.size(); i++) 
+	  {
+	    if ( kept_subjets[i].m() > largest_mass_subjet )
+	      {
+		largest_mass_subjet = kept_subjets[i].m();
+	      }
+	  }
+
+	double massdrop=1;
+	if ( trimmedMass!=0 ) massdrop = largest_mass_subjet / trimmedMass;
+	candidate->MassDrop=massdrop;
+
+	//------------------------------------
+	// NSubJettiness
+	//------------------------------------
+	double beta = 1.0; // power for angular dependence, e.g. beta = 1 --> linear k-means, beta = 2 --> quadratic/classic k-means
+	double R0 = 0.8; // Characteristic jet radius for normalization
+	double Rcut = 10000.0; // maximum R particles can be from axis to be included in jet (large value for no cutoff)   
+	NsubParameters paraNsub(beta, R0, Rcut);
+
+	Njettiness nSubOnePass(Njettiness::onepass_kt_axes,paraNsub);
+
+	vector<fastjet::PseudoJet> jet_constituents = itOutputList->constituents();
+	candidate->Tau1 = nSubOnePass.getTau(1,jet_constituents);
+	candidate->Tau2 = nSubOnePass.getTau(2,jet_constituents);
+	candidate->Tau3 = nSubOnePass.getTau(3,jet_constituents);
+
+	//------------------------------------
+	// W-tag - Mass drop from trimmed jets
+	//------------------------------------
+
+	if (massdrop < 0.4 && 60 < trimmedMass && trimmedMass < 120)
+	    candidate->WTag=1;
+
+	//------------------------------------
+	// Top-tag
+	//------------------------------------
+
+	if (kept_subjets.size()>=3 && 140 < trimmedMass && trimmedMass < 230)
+	  candidate->TopTag=1;
+
+        //------------------------------------
+        // h-tag - Mass drop from trimmed jets
+        //------------------------------------
+
+        if (massdrop < 0.4 && 100 < trimmedMass && trimmedMass < 140)
+          candidate->HTag=1;
+    }
+    
     fOutputArray->Add(candidate);
   }
   delete sequence;

@@ -8,8 +8,8 @@
  *  to the candidate's transverse momentum. outputs candidates that have
  *  the transverse momenta fraction within (PTRatioMin, PTRatioMax].
  *
- *  $Date: 2013-08-19 15:40:54 +0200 (Mon, 19 Aug 2013) $
- *  $Revision: 1267 $
+ *  $Date: 2013-03-06 17:53:27 +0100 (Wed, 06 Mar 2013) $
+ *  $Revision: 1028 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -39,10 +39,6 @@ private:
   Double_t fDeltaRMax;
 
   Double_t fPTRatioMax;
-
-  Double_t fPTSumMax;
-
-  Bool_t fUsePTSum;
 
   IsolationClassifier *fClassifier; //!
 

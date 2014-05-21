@@ -6,8 +6,8 @@
  *  Reads LHEF file
  *
  *
- *  $Date: 2013-08-16 16:29:25 +0200 (Fri, 16 Aug 2013) $
- *  $Revision: 1265 $
+ *  $Date: 2013-03-10 00:26:28 +0100 (Sun, 10 Mar 2013) $
+ *  $Revision: 1052 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -15,8 +15,6 @@
  */
 
 #include <stdio.h>
-
-#include <vector>
 
 class TObjArray;
 class TStopwatch;
@@ -44,8 +42,6 @@ public:
   void AnalyzeEvent(ExRootTreeBranch *branch, long long eventNumber,
     TStopwatch *readStopWatch, TStopwatch *procStopWatch);
 
-  void AnalyzeRwgt(ExRootTreeBranch *branch);
-
 private:
 
   void AnalyzeParticle(DelphesFactory *factory,
@@ -59,8 +55,6 @@ private:
 
   TDatabasePDG *fPDG;
 
-  bool fEventReady;
-
   int fEventCounter;
 
   int fParticleCounter, fProcessID;
@@ -68,8 +62,6 @@ private:
 
   int fPID, fStatus, fM1, fM2, fC1, fC2;
   double fPx, fPy, fPz, fE, fMass;
-  
-  std::vector<double> fRwgtList;
 };
 
 #endif // DelphesLHEFReader_h

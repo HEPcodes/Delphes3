@@ -94,9 +94,13 @@ TLorentzVector Tower::P4()
 
 Candidate::Candidate() :
   PID(0), Status(0), M1(-1), M2(-1), D1(-1), D2(-1),
+  IsolationVar(0),
   Charge(0), Mass(0.0),
   IsPU(0), IsConstituent(0),
   BTag(0), TauTag(0), Eem(0.0), Ehad(0.0),
+  WTag(0), TopTag(0), HTag(0),
+  Tau1(-999), Tau2(-999), Tau3(-999),
+  NSubJets(-999), MassDrop(-999), TrimmedMass(-999),
   DeltaEta(0.0), DeltaPhi(0.0),
   Momentum(0.0, 0.0, 0.0, 0.0),
   Position(0.0, 0.0, 0.0, 0.0),
@@ -174,6 +178,7 @@ void Candidate::Copy(TObject &obj) const
 
   object.PID = PID;
   object.Status = Status;
+  object.IsolationVar = IsolationVar;
   object.M1 = M1;
   object.M2 = M2;
   object.D1 = D1;
@@ -184,6 +189,15 @@ void Candidate::Copy(TObject &obj) const
   object.IsConstituent = IsConstituent;
   object.BTag = BTag;
   object.TauTag = TauTag;
+  object.WTag = WTag;
+  object.TopTag = TopTag;
+  object.HTag = HTag;
+  object.Tau1=Tau1; 
+  object.Tau2=Tau2; 
+  object.Tau3=Tau3;
+  object.NSubJets=NSubJets;
+  object.MassDrop=MassDrop;
+  object.TrimmedMass=TrimmedMass;
   object.Eem = Eem;
   object.Ehad = Ehad;
   object.Edges[0] = Edges[0];
@@ -218,6 +232,7 @@ void Candidate::Clear(Option_t* option)
   ResetBit(kIsReferenced);
   PID = 0;
   Status = 0;
+  IsolationVar =0.;
   M1 = -1; M2 = -1; D1 = -1; D2 = -1;
   Charge = 0;
   Mass = 0.0;
@@ -225,6 +240,15 @@ void Candidate::Clear(Option_t* option)
   IsConstituent = 0;
   BTag = 0;
   TauTag = 0;
+  WTag = 0;
+  TopTag = 0;
+  HTag = 0;
+  Tau1 = -999;
+  Tau2 = -999;
+  Tau3 = -999;
+  NSubJets=-999;
+  MassDrop = -999;
+  TrimmedMass = -999;
   Eem = 0.0;
   Ehad = 0.0;
   Edges[0] = 0.0;

@@ -4,8 +4,8 @@
  *  Reads LHEF file
  *
  *
- *  $Date: 2013-08-16 16:29:25 +0200 (Fri, 16 Aug 2013) $
- *  $Revision: 1265 $
+ *  $Date: 2013-07-08 21:27:21 +0200 (Mon, 08 Jul 2013) $
+ *  $Revision: 1189 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -40,7 +40,7 @@ static const int kBufferSize  = 1024;
 
 DelphesLHEFReader::DelphesLHEFReader() :
   fInputFile(0), fBuffer(0), fPDG(0),
-  fEventReady(kFALSE), fEventCounter(-1), fParticleCounter(-1)
+  fEventCounter(-1), fParticleCounter(-1)
 {
   fBuffer = new char[kBufferSize];
 
@@ -65,17 +65,15 @@ void DelphesLHEFReader::SetInputFile(FILE *inputFile)
 
 void DelphesLHEFReader::Clear()
 {
-  fEventReady = kFALSE;
   fEventCounter = -1;
   fParticleCounter = -1;
-  fRwgtList.clear();
 }
 
 //---------------------------------------------------------------------------
 
 bool DelphesLHEFReader::EventReady()
 {
-  return fEventReady;
+  return (fEventCounter == 0) && (fParticleCounter == 0);
 }
 
 //---------------------------------------------------------------------------
@@ -86,10 +84,10 @@ bool DelphesLHEFReader::ReadBlock(DelphesFactory *factory,
   TObjArray *partonOutputArray)
 {
   int rc;
-  char *pch;
-  double weight;
 
   if(!fgets(fBuffer, kBufferSize, fInputFile)) return kFALSE;
+
+  DelphesStream bufferStream(fBuffer);
 
   if(strstr(fBuffer, "<event>"))
   {
@@ -98,8 +96,6 @@ bool DelphesLHEFReader::ReadBlock(DelphesFactory *factory,
   }
   else if(fEventCounter > 0)
   {
-    DelphesStream bufferStream(fBuffer);
-
     rc = bufferStream.ReadInt(fParticleCounter)
       && bufferStream.ReadInt(fProcessID)
       && bufferStream.ReadDbl(fWeight)
@@ -117,8 +113,6 @@ bool DelphesLHEFReader::ReadBlock(DelphesFactory *factory,
   }
   else if(fParticleCounter > 0)
   {
-    DelphesStream bufferStream(fBuffer);
-
     rc = bufferStream.ReadInt(fPID)
       && bufferStream.ReadInt(fStatus)
       && bufferStream.ReadInt(fM1)
@@ -142,30 +136,6 @@ bool DelphesLHEFReader::ReadBlock(DelphesFactory *factory,
 
     --fParticleCounter;
   }
-  else if(strstr(fBuffer, "<wgt"))
-  {
-    pch = strstr(fBuffer, ">");
-    if(!pch)
-    {
-      cerr << "** ERROR: " << "invalid weight format" << endl;
-      return kFALSE;
-    }
-
-    DelphesStream bufferStream(pch + 1);
-    rc = bufferStream.ReadDbl(weight);
-
-    if(!rc)
-    {
-      cerr << "** ERROR: " << "invalid weight format" << endl;
-      return kFALSE;
-    }
-
-    fRwgtList.push_back(weight);
-  }
-  else if(strstr(fBuffer, "</event>"))
-  {
-    fEventReady = kTRUE;
-  }
 
   return kTRUE;
 }
@@ -188,21 +158,6 @@ void DelphesLHEFReader::AnalyzeEvent(ExRootTreeBranch *branch, long long eventNu
 
   element->ReadTime = readStopWatch->RealTime();
   element->ProcTime = procStopWatch->RealTime();
-}
-
-//---------------------------------------------------------------------------
-
-void DelphesLHEFReader::AnalyzeRwgt(ExRootTreeBranch *branch)
-{
-  Weight *element;
-  vector<double>::const_iterator itRwgtList;
-
-  for(itRwgtList = fRwgtList.begin(); itRwgtList != fRwgtList.end(); ++itRwgtList)
-  {
-    element = static_cast<Weight *>(branch->NewEntry());
-
-    element->Weight = *itRwgtList;
-  }
 }
 
 //---------------------------------------------------------------------------

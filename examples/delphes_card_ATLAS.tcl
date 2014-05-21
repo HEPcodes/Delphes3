@@ -31,7 +31,7 @@ set ExecutionPath {
   GenJetFinder
   FastJetFinder
 
-  JetEnergyScale
+  ConstituentFilter
 
   BTagging
   TauTagging
@@ -134,12 +134,14 @@ module MomentumSmearing ChargedHadronMomentumSmearing {
   # set ResolutionFormula {resolution formula as a function of eta and pt}
 
   # resolution formula for charged hadrons
-  set ResolutionFormula {                  (abs(eta) <= 1.5) * (pt > 0.1   && pt <= 1.0e1) * (0.20) + \
-                                           (abs(eta) <= 1.5) * (pt > 1.0e1 && pt <= 2.0e2) * (0.20) + \
-                                           (abs(eta) <= 1.5) * (pt > 2.0e2)                * (0.20) + \
-                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0   && pt <= 1.0e1) * (0.20) + \
-                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0e1 && pt <= 2.0e2) * (0.20) + \
-                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 2.0e2)                * (0.20)}
+  set ResolutionFormula {                  (abs(eta) <= 1.5) * (pt > 0.1   && pt <= 1.0)   * (0.02) + \
+                                           (abs(eta) <= 1.5) * (pt > 1.0   && pt <= 1.0e1) * (0.01) + \
+                                           (abs(eta) <= 1.5) * (pt > 1.0e1 && pt <= 2.0e2) * (0.03) + \
+                                           (abs(eta) <= 1.5) * (pt > 2.0e2)                * (0.05) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 0.1   && pt <= 1.0)   * (0.03) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0   && pt <= 1.0e1) * (0.02) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0e1 && pt <= 2.0e2) * (0.04) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 2.0e2)                * (0.05)}
 }
 
 #################################
@@ -171,13 +173,13 @@ module MomentumSmearing MuonMomentumSmearing {
 
   # resolution formula for muons
   set ResolutionFormula {                  (abs(eta) <= 1.5) * (pt > 0.1   && pt <= 1.0)   * (0.03) + \
-                                           (abs(eta) <= 1.5) * (pt > 1.0   && pt <= 5.0e1) * (0.03) + \
-                                           (abs(eta) <= 1.5) * (pt > 5.0e1 && pt <= 1.0e2) * (0.04) + \
-                                           (abs(eta) <= 1.5) * (pt > 1.0e2)                * (0.07) + \
+                                           (abs(eta) <= 1.5) * (pt > 1.0   && pt <= 1.0e1) * (0.02) + \
+                                           (abs(eta) <= 1.5) * (pt > 1.0e1 && pt <= 2.0e2) * (0.03) + \
+                                           (abs(eta) <= 1.5) * (pt > 2.0e2)                * (0.05) + \
                          (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 0.1   && pt <= 1.0)   * (0.04) + \
-                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0   && pt <= 5.0e1) * (0.04) + \
-                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 5.0e1 && pt <= 1.0e2) * (0.05) + \
-                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0e2)                * (0.10)}
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0   && pt <= 1.0e1) * (0.03) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0e1 && pt <= 2.0e2) * (0.04) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 2.0e2)                * (0.05)}
 }
 
 ##############
@@ -397,7 +399,7 @@ module Merger ScalarHT {
   add InputArray UniqueObjectFinder/jets
   add InputArray UniqueObjectFinder/electrons
   add InputArray UniqueObjectFinder/photons
-  add InputArray UniqueObjectFinder/muons
+  add InputArray MuonIsolation/muons
   set EnergyOutputArray energy
 }
 
@@ -412,7 +414,17 @@ module FastJetFinder GenJetFinder {
 
   # algorithm: 1 CDFJetClu, 2 MidPoint, 3 SIScone, 4 kt, 5 Cambridge/Aachen, 6 antikt
   set JetAlgorithm 6
-  set ParameterR 0.6
+  set ParameterR 0.7
+
+  set ConeRadius 0.5
+  set SeedThreshold 1.0
+  set ConeAreaFraction 1.0
+  set AdjacencyCut 2.0
+  set OverlapThreshold 0.75
+
+  set MaxIterations 100
+  set MaxPairSize 2
+  set Iratch 1
 
   set JetPTMin 20.0
 }
@@ -422,27 +434,43 @@ module FastJetFinder GenJetFinder {
 ############
 
 module FastJetFinder FastJetFinder {
-  set InputArray Calorimeter/towers
+#  set InputArray Calorimeter/towers
+  set InputArray EFlowMerger/eflow
 
   set OutputArray jets
 
   # algorithm: 1 CDFJetClu, 2 MidPoint, 3 SIScone, 4 kt, 5 Cambridge/Aachen, 6 antikt
   set JetAlgorithm 6
-  set ParameterR 0.6
+  set ParameterR 0.7
+
+  set ConeRadius 0.5
+  set SeedThreshold 1.0
+  set ConeAreaFraction 1.0
+  set AdjacencyCut 2.0
+  set OverlapThreshold 0.75
+
+  set MaxIterations 100
+  set MaxPairSize 2
+  set Iratch 1
 
   set JetPTMin 20.0
 }
 
-##################
-# Jet Energy Scale
-##################
+####################
+# Constituent filter
+####################
 
-module EnergyScale JetEnergyScale {
-  set InputArray FastJetFinder/jets
-  set OutputArray jets
+module ConstituentFilter ConstituentFilter {
 
- # scale formula for jets
-  set ScaleFormula {1.08}
+# add JetInputArray InputArray
+  add JetInputArray GenJetFinder/jets
+  add JetInputArray FastJetFinder/jets
+
+# add ConstituentInputArray InputArray OutputArray
+  add ConstituentInputArray Delphes/stableParticles stableParticles
+  add ConstituentInputArray Calorimeter/eflowTracks eflowTracks
+  add ConstituentInputArray Calorimeter/eflowTowers eflowTowers
+  add ConstituentInputArray MuonMomentumSmearing/muons muons
 }
 
 ###########
@@ -451,7 +479,7 @@ module EnergyScale JetEnergyScale {
 
 module BTagging BTagging {
   set PartonInputArray Delphes/partons
-  set JetInputArray JetEnergyScale/jets
+  set JetInputArray FastJetFinder/jets
 
   set BitNumber 0
 
@@ -467,24 +495,16 @@ module BTagging BTagging {
 
   # default efficiency formula (misidentification rate)
   add EfficiencyFormula {0} {0.001}
-
   # efficiency formula for c-jets (misidentification rate)
-  add EfficiencyFormula {4} {                                      (pt <= 15.0) * (0.000) + \
-                                                (abs(eta) <= 1.2) * (pt > 15.0) * (0.2*tanh(pt*0.03 - 0.4)) + \
-                              (abs(eta) > 1.2 && abs(eta) <= 2.5) * (pt > 15.0) * (0.1*tanh(pt*0.03 - 0.4)) + \
-                              (abs(eta) > 2.5)                                  * (0.000)}
-
+  add EfficiencyFormula {4} {0.1}
   # efficiency formula for b-jets
-  add EfficiencyFormula {5} {                                      (pt <= 15.0) * (0.000) + \
-                                                (abs(eta) <= 1.2) * (pt > 15.0) * (0.5*tanh(pt*0.03 - 0.4)) + \
-                              (abs(eta) > 1.2 && abs(eta) <= 2.5) * (pt > 15.0) * (0.4*tanh(pt*0.03 - 0.4)) + \
-                              (abs(eta) > 2.5)                                  * (0.000)}
+  add EfficiencyFormula {5} {0.4}
 }
 
 module TauTagging TauTagging {
   set ParticleInputArray Delphes/allParticles
   set PartonInputArray Delphes/partons
-  set JetInputArray JetEnergyScale/jets
+  set JetInputArray FastJetFinder/jets
 
   set DeltaR 0.5
 
@@ -509,8 +529,7 @@ module UniqueObjectFinder UniqueObjectFinder {
 # add InputArray InputArray OutputArray
   add InputArray PhotonIsolation/photons photons
   add InputArray ElectronIsolation/electrons electrons
-  add InputArray MuonIsolation/muons muons
-  add InputArray JetEnergyScale/jets jets
+  add InputArray FastJetFinder/jets jets
 }
 
 ##################
@@ -522,14 +541,14 @@ module TreeWriter TreeWriter {
   add Branch Delphes/allParticles Particle GenParticle
   add Branch TrackMerger/tracks Track Track
   add Branch Calorimeter/towers Tower Tower
-#  add Branch Calorimeter/eflowTracks EFlowTrack Track
-#  add Branch Calorimeter/eflowTowers EFlowTower Tower
-#  add Branch MuonMomentumSmearing/muons EFlowMuon Muon
+  add Branch ConstituentFilter/eflowTracks EFlowTrack Track
+  add Branch ConstituentFilter/eflowTowers EFlowTower Tower
+  add Branch ConstituentFilter/muons EFlowMuon Muon
   add Branch GenJetFinder/jets GenJet Jet
   add Branch UniqueObjectFinder/jets Jet Jet
   add Branch UniqueObjectFinder/electrons Electron Electron
   add Branch UniqueObjectFinder/photons Photon Photon
-  add Branch UniqueObjectFinder/muons Muon Muon
+  add Branch MuonIsolation/muons Muon Muon
   add Branch MissingET/momentum MissingET MissingET
   add Branch ScalarHT/energy ScalarHT ScalarHT
 }
