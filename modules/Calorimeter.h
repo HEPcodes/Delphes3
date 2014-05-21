@@ -6,8 +6,8 @@
  *  Fills calorimeter towers, performs calorimeter resolution smearing,
  *  preselects towers hit by photons and creates energy flow objects.
  *
- *  $Date: 2013-07-22 22:00:23 +0200 (Mon, 22 Jul 2013) $
- *  $Revision: 1235 $
+ *  $Date: 2013-09-03 17:54:56 +0200 (Tue, 03 Sep 2013) $
+ *  $Revision: 1273 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -43,9 +43,8 @@ private:
   Candidate *fTower;
   Double_t fTowerEta, fTowerPhi, fTowerEdges[4];
   Double_t fTowerECalEnergy, fTowerHCalEnergy;
-  Double_t fTowerECalNeutralEnergy, fTowerHCalNeutralEnergy;
-  Int_t fTowerPhotonHits, fTowerECalHits, fTowerHCalHits, fTowerAllHits;
-  Int_t fTowerECalTrackHits, fTowerHCalTrackHits, fTowerTrackAllHits;
+  Double_t fTrackECalEnergy, fTrackHCalEnergy;
+  Int_t fTowerTrackHits, fTowerPhotonHits;
 
   TFractionMap fFractionMap; //!
   TBinMap fBinMap; //!
@@ -55,8 +54,11 @@ private:
 
   std::vector < Long64_t > fTowerHits;
 
-  std::vector < Double_t > fECalFractions;
-  std::vector < Double_t > fHCalFractions;
+  std::vector < Double_t > fTowerECalFractions;
+  std::vector < Double_t > fTowerHCalFractions;
+
+  std::vector < Double_t > fTrackECalFractions;
+  std::vector < Double_t > fTrackHCalFractions;
 
   DelphesFormula *fECalResolutionFormula; //!
   DelphesFormula *fHCalResolutionFormula; //!
@@ -73,20 +75,8 @@ private:
   TObjArray *fEFlowTrackOutputArray; //!
   TObjArray *fEFlowTowerOutputArray; //!
 
-  TObjArray *fTowerECalArray; //!
-  TIterator *fItTowerECalArray; //!
-
-  TObjArray *fTowerHCalArray; //!
-  TIterator *fItTowerHCalArray; //!
-
   TObjArray *fTowerTrackArray; //!
   TIterator *fItTowerTrackArray; //!
-
-  TObjArray *fTowerECalTrackArray; //!
-  TIterator *fItTowerECalTrackArray; //!
-
-  TObjArray *fTowerHCalTrackArray; //!
-  TIterator *fItTowerHCalTrackArray; //!
 
   void FinalizeTower();
   Double_t LogNormal(Double_t mean, Double_t sigma);

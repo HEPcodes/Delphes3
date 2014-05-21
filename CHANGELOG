@@ -1,15 +1,25 @@
+3.0.11:
+  new energy-flow algorithm, optimized for better compatibility with pile-up subtraction 
+  added possibility of computing pile-up density in different eta regions via the RhoEtaRange parameter in FastJetFinder module
+  implemented correct efficiency/resolution for high pt muons in CMS cards
+  removed pile-up subtraction on missing energy
+  added possibility to read re-weighting information from LHEF input files
+  added UsePTSum and PTSumMax parameters to isolation module
+  added possibility of specifying the shape of pile-up distribution (via the PileUpDistribution parameter in the PileUpMerger module)
+  added pile-up Vertex collection to the output tree
+
 3.0.10:
   new readers (DelphesProMC.cpp, DelphesProMC.py (#220), DelphesPythia8)
   new modules (EnergyScale, PileUpMergerPythia8, Weighter)
-  new module parameters (absolute/relative isolation (#204), flat/poisson pile-up distribution)
+  new module parameters (absolute/relative isolation (#187), flat/poisson pile-up distribution)
   new global parameters (max number of events, skip events (#183), random seed (#202))
   new branches (pile-up event density rho, MC event weight)
   updated CMS and ALTAS detector cards (and added ATLAS pile-up detector card)
   calorimeter smearing is now performed according to a logNormal distribution
-  improved particle-flow algorithm
+  improved particle-flow algorithm (#204)
   added calculation of particle propagation time in the tracker
   fixed tau-jet matching by only considering visible hadronic tau (#208)
-  read masses from MC event file (#201)
+  read masses from MC event file (#195, #201)
   bug fixes in DelphesCMSFWLite (#196)
   compilable analysis macro examples (#182)
   ability to read MC re-weighting information from LHE files

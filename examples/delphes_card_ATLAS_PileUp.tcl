@@ -56,7 +56,8 @@ set ExecutionPath {
 module PileUpMerger PileUpMerger {
   set InputArray Delphes/stableParticles
 
-  set OutputArray stableParticles
+  set ParticleOutputArray stableParticles
+  set VertexOutputArray vertices
 
   # pre-generated minbias input file
   set PileUpFile MinBias.pileup
@@ -158,12 +159,14 @@ module MomentumSmearing ChargedHadronMomentumSmearing {
   # set ResolutionFormula {resolution formula as a function of eta and pt}
 
   # resolution formula for charged hadrons
-  set ResolutionFormula {                  (abs(eta) <= 1.5) * (pt > 0.1   && pt <= 1.0e1) * (0.20) + \
-                                           (abs(eta) <= 1.5) * (pt > 1.0e1 && pt <= 2.0e2) * (0.20) + \
-                                           (abs(eta) <= 1.5) * (pt > 2.0e2)                * (0.20) + \
-                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0   && pt <= 1.0e1) * (0.20) + \
-                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0e1 && pt <= 2.0e2) * (0.20) + \
-                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 2.0e2)                * (0.20)}
+  set ResolutionFormula {                  (abs(eta) <= 1.5) * (pt > 0.1   && pt <= 1.0)   * (0.02) + \
+                                           (abs(eta) <= 1.5) * (pt > 1.0   && pt <= 1.0e1) * (0.01) + \
+                                           (abs(eta) <= 1.5) * (pt > 1.0e1 && pt <= 2.0e2) * (0.03) + \
+                                           (abs(eta) <= 1.5) * (pt > 2.0e2)                * (0.05) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 0.1   && pt <= 1.0)   * (0.03) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0   && pt <= 1.0e1) * (0.02) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0e1 && pt <= 2.0e2) * (0.04) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 2.0e2)                * (0.05)}
 }
 
 #################################
@@ -212,6 +215,7 @@ module Merger TrackMerger {
 # add InputArray InputArray
   add InputArray ChargedHadronMomentumSmearing/chargedHadrons
   add InputArray ElectronEnergySmearing/electrons
+  add InputArray MuonMomentumSmearing/muons
   set OutputArray tracks
 }
 
@@ -311,7 +315,6 @@ module Merger EFlowMerger {
 # add InputArray InputArray
   add InputArray TrackPileUpSubtractor/eflowTracks
   add InputArray Calorimeter/eflowTowers
-  add InputArray MuonMomentumSmearing/muons
   set OutputArray eflow
 }
 
@@ -333,6 +336,8 @@ module FastJetFinder Rho {
   set ParameterR 0.6
   set GhostEtaMax 5.0
   set RhoEtaMax 5.0
+
+  add RhoEtaRange 0.0 5.0
 
   set JetPTMin 0.0
 }
@@ -508,7 +513,8 @@ module Isolation MuonIsolation {
 
 module Merger MissingET {
 # add InputArray InputArray
-  add InputArray EFlowMerger/eflow
+  add InputArray Calorimeter/eflowTracks
+  add InputArray Calorimeter/eflowTowers
   set MomentumOutputArray momentum
 }
 
@@ -604,7 +610,6 @@ module TreeWriter TreeWriter {
   add Branch Calorimeter/towers Tower Tower
 #  add Branch Calorimeter/eflowTracks EFlowTrack Track
 #  add Branch Calorimeter/eflowTowers EFlowTower Tower
-#  add Branch MuonMomentumSmearing/muons EFlowMuon Muon
   add Branch GenJetFinder/jets GenJet Jet
   add Branch UniqueObjectFinder/jets Jet Jet
   add Branch UniqueObjectFinder/electrons Electron Electron
@@ -613,5 +618,6 @@ module TreeWriter TreeWriter {
   add Branch MissingET/momentum MissingET MissingET
   add Branch ScalarHT/energy ScalarHT ScalarHT
   add Branch Rho/rho Rho Rho
+  add Branch PileUpMerger/vertices Vertex Vertex
 }
 

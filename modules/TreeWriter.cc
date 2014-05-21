@@ -3,8 +3,8 @@
  *
  *  Fills ROOT tree branches.
  *
- *  $Date: 2013-05-26 02:00:39 +0200 (Sun, 26 May 2013) $
- *  $Revision: 1123 $
+ *  $Date: 2013-11-12 15:48:27 +0100 (Tue, 12 Nov 2013) $
+ *  $Revision: 1325 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -55,6 +55,7 @@ TreeWriter::~TreeWriter()
 void TreeWriter::Init()
 {
   fClassMap[GenParticle::Class()] = &TreeWriter::ProcessParticles;
+  fClassMap[Vertex::Class()] = &TreeWriter::ProcessVertices;
   fClassMap[Track::Class()] = &TreeWriter::ProcessTracks;
   fClassMap[Tower::Class()] = &TreeWriter::ProcessTowers;
   fClassMap[Photon::Class()] = &TreeWriter::ProcessPhotons;
@@ -212,6 +213,29 @@ void TreeWriter::ProcessParticles(ExRootTreeBranch *branch, TObjArray *array)
 
 //------------------------------------------------------------------------------
 
+void TreeWriter::ProcessVertices(ExRootTreeBranch *branch, TObjArray *array)
+{
+  TIter iterator(array);
+  Candidate *candidate = 0;
+  Vertex *entry = 0;
+
+  // loop over all vertices
+  iterator.Reset();
+  while((candidate = static_cast<Candidate*>(iterator.Next())))
+  {
+    const TLorentzVector &position = candidate->Position;
+
+    entry = static_cast<Vertex*>(branch->NewEntry());
+
+    entry->X = position.X();
+    entry->Y = position.Y();
+    entry->Z = position.Z();
+    entry->T = position.T();
+  }
+}
+
+//------------------------------------------------------------------------------
+
 void TreeWriter::ProcessTracks(ExRootTreeBranch *branch, TObjArray *array)
 {
   TIter iterator(array);
@@ -220,7 +244,7 @@ void TreeWriter::ProcessTracks(ExRootTreeBranch *branch, TObjArray *array)
   Track *entry = 0;
   Double_t pt, signz, cosTheta, eta, rapidity;
 
-  // loop over all jets
+  // loop over all tracks
   iterator.Reset();
   while((candidate = static_cast<Candidate*>(iterator.Next())))
   {
@@ -279,7 +303,7 @@ void TreeWriter::ProcessTowers(ExRootTreeBranch *branch, TObjArray *array)
   Tower *entry = 0;
   Double_t pt, signPz, cosTheta, eta, rapidity;
 
-  // loop over all jets
+  // loop over all towers
   iterator.Reset();
   while((candidate = static_cast<Candidate*>(iterator.Next())))
   {
@@ -495,6 +519,7 @@ void TreeWriter::ProcessMissingET(ExRootTreeBranch *branch, TObjArray *array)
 
     entry = static_cast<MissingET*>(branch->NewEntry());
 
+    entry->Eta = (-momentum).Eta();
     entry->Phi = (-momentum).Phi();
     entry->MET = momentum.Pt();
   }
@@ -522,17 +547,21 @@ void TreeWriter::ProcessScalarHT(ExRootTreeBranch *branch, TObjArray *array)
 
 void TreeWriter::ProcessRho(ExRootTreeBranch *branch, TObjArray *array)
 {
+  TIter iterator(array);
   Candidate *candidate = 0;
   Rho *entry = 0;
 
-  // get the first entry
-  if((candidate = static_cast<Candidate*>(array->At(0))))
+  // loop over all rho
+  iterator.Reset();
+  while((candidate = static_cast<Candidate*>(iterator.Next())))
   {
     const TLorentzVector &momentum = candidate->Momentum;
 
     entry = static_cast<Rho*>(branch->NewEntry());
 
     entry->Rho = momentum.E();
+    entry->Edges[0] = candidate->Edges[0];
+    entry->Edges[1] = candidate->Edges[1];
   }
 }
 

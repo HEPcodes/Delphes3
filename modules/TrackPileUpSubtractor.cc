@@ -3,8 +3,8 @@
  *
  *  Subtract pile-up contribution from tracks.
  *
- *  $Date: 2013-03-24 21:25:01 +0100 (Sun, 24 Mar 2013) $
- *  $Revision: 1073 $
+ *  $Date: 2013-11-04 11:21:27 +0100 (Mon, 04 Nov 2013) $
+ *  $Revision: 1314 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -67,7 +67,7 @@ void TrackPileUpSubtractor::Init()
     array = ImportArray(param[i*2].GetString());
     iterator = array->MakeIterator();
 
-    fInputMap[iterator] = ExportArray(param[i*2 + 1].GetString());;
+    fInputMap[iterator] = ExportArray(param[i*2 + 1].GetString());
   }
 }
 

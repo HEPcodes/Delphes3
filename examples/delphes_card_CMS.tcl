@@ -134,12 +134,14 @@ module MomentumSmearing ChargedHadronMomentumSmearing {
   # set ResolutionFormula {resolution formula as a function of eta and pt}
 
   # resolution formula for charged hadrons
-  set ResolutionFormula {                  (abs(eta) <= 1.5) * (pt > 0.1   && pt <= 1.0e1) * (0.20) + \
-                                           (abs(eta) <= 1.5) * (pt > 1.0e1 && pt <= 2.0e2) * (0.20) + \
-                                           (abs(eta) <= 1.5) * (pt > 2.0e2)                * (0.20) + \
-                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0   && pt <= 1.0e1) * (0.20) + \
-                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0e1 && pt <= 2.0e2) * (0.20) + \
-                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 2.0e2)                * (0.20)}
+  set ResolutionFormula {                  (abs(eta) <= 1.5) * (pt > 0.1   && pt <= 1.0)   * (0.02) + \
+                                           (abs(eta) <= 1.5) * (pt > 1.0   && pt <= 1.0e1) * (0.01) + \
+                                           (abs(eta) <= 1.5) * (pt > 1.0e1 && pt <= 2.0e2) * (0.03) + \
+                                           (abs(eta) <= 1.5) * (pt > 2.0e2)                * (0.05) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 0.1   && pt <= 1.0)   * (0.03) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0   && pt <= 1.0e1) * (0.02) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0e1 && pt <= 2.0e2) * (0.04) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 2.0e2)                * (0.05)}
 }
 
 #################################
@@ -153,7 +155,7 @@ module EnergySmearing ElectronEnergySmearing {
   # set ResolutionFormula {resolution formula as a function of eta and energy}
 
   # resolution formula for electrons
-  set ResolutionFormula {                  (abs(eta) <= 2.5) * (energy > 0.1   && energy <= 2.0e1) * (0.0225)*energy + \
+  set ResolutionFormula {                  (abs(eta) <= 2.5) * (energy > 0.1   && energy <= 2.0e1) * (energy*0.0225) + \
                                            (abs(eta) <= 2.5) * (energy > 2.0e1)                    * sqrt(energy^2*0.007^2 + energy*0.07^2 + 0.35^2) + \
                          (abs(eta) > 2.5 && abs(eta) <= 3.0)                                       * sqrt(energy^2*0.007^2 + energy*0.07^2 + 0.35^2) + \
                          (abs(eta) > 3.0 && abs(eta) <= 5.0)                                       * sqrt(energy^2*0.107^2 + energy*2.08^2)}
@@ -173,13 +175,16 @@ module MomentumSmearing MuonMomentumSmearing {
   # resolution formula for muons
   set ResolutionFormula {                  (abs(eta) <= 0.5) * (pt > 0.1   && pt <= 5.0)   * (0.02) + \
                                            (abs(eta) <= 0.5) * (pt > 5.0   && pt <= 1.0e2) * (0.015) + \
-                                           (abs(eta) <= 0.5) * (pt > 1.0e2)                * (0.03) + \
+                                           (abs(eta) <= 0.5) * (pt > 1.0e2 && pt <= 2.0e2) * (0.03) + \
+                                           (abs(eta) <= 0.5) * (pt > 2.0e2)                * (0.05 + pt*1.e-4) + \
                          (abs(eta) > 0.5 && abs(eta) <= 1.5) * (pt > 0.1   && pt <= 5.0)   * (0.03) + \
                          (abs(eta) > 0.5 && abs(eta) <= 1.5) * (pt > 5.0   && pt <= 1.0e2) * (0.02) + \
-                         (abs(eta) > 0.5 && abs(eta) <= 1.5) * (pt > 1.0e2)                * (0.04) + \
+                         (abs(eta) > 0.5 && abs(eta) <= 1.5) * (pt > 1.0e2 && pt <= 2.0e2) * (0.04) + \
+                         (abs(eta) > 0.5 && abs(eta) <= 1.5) * (pt > 2.0e2)                * (0.05 + pt*1.e-4) + \
                          (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 0.1   && pt <= 5.0)   * (0.04) + \
                          (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 5.0   && pt <= 1.0e2) * (0.035) + \
-                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0e2)                * (0.05)}
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 1.0e2 && pt <= 2.0e2) * (0.05) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.5) * (pt > 2.0e2)                * (0.05 + pt*1.e-4)}
 }
 
 ##############
@@ -190,6 +195,7 @@ module Merger TrackMerger {
 # add InputArray InputArray
   add InputArray ChargedHadronMomentumSmearing/chargedHadrons
   add InputArray ElectronEnergySmearing/electrons
+  add InputArray MuonMomentumSmearing/muons
   set OutputArray tracks
 }
 
@@ -265,9 +271,8 @@ module Calorimeter Calorimeter {
                              (abs(eta) > 3.0 && abs(eta) <= 5.0) * sqrt(energy^2*0.107^2 + energy*2.08^2)}
 
   # set HCalResolutionFormula {resolution formula as a function of eta and energy}
-  set HCalResolutionFormula {                  (abs(eta) <= 1.5) * sqrt(energy^2*0.055^2 + energy*1.20^2 + 3.50^2) + \
-                                               (abs(eta) > 1.5 && abs(eta) <= 3)   * sqrt(energy^2*0.065^2 + energy*2.00^2 + 3.50^2) + \
-                                               (abs(eta) > 3.0 && abs(eta) <= 5.0) * sqrt(energy^2*0.11^2 + energy*3.13^2)}
+  set HCalResolutionFormula {                  (abs(eta) <= 3.0) * sqrt(energy^2*0.050^2 + energy*1.50^2) + \
+                             (abs(eta) > 3.0 && abs(eta) <= 5.0) * sqrt(energy^2*0.130^2 + energy*2.70^2)}
 }
 
 ####################
@@ -278,7 +283,6 @@ module Merger EFlowMerger {
 # add InputArray InputArray
   add InputArray Calorimeter/eflowTracks
   add InputArray Calorimeter/eflowTowers
-  add InputArray MuonMomentumSmearing/muons
   set OutputArray eflow
 }
 
@@ -361,10 +365,12 @@ module Efficiency MuonEfficiency {
   # set EfficiencyFormula {efficiency as a function of eta and pt}
 
   # efficiency formula for muons
-  set EfficiencyFormula {                                      (pt <= 10.0) * (0.00) + \
-                                           (abs(eta) <= 1.5) * (pt > 10.0)  * (0.95) + \
-                         (abs(eta) > 1.5 && abs(eta) <= 2.4) * (pt > 10.0)  * (0.85) + \
-                         (abs(eta) > 2.4)                                   * (0.00)}
+  set EfficiencyFormula {                                      (pt <= 10.0)               * (0.00) + \
+                                           (abs(eta) <= 1.5) * (pt > 10.0 && pt <= 1.0e3) * (0.95) + \
+                                           (abs(eta) <= 1.5) * (pt > 1.0e3)               * (0.95 * exp(0.5 - pt*5.0e-4)) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.4) * (pt > 10.0 && pt <= 1.0e3) * (0.95) + \
+                         (abs(eta) > 1.5 && abs(eta) <= 2.4) * (pt > 1.0e3)               * (0.95 * exp(0.5 - pt*5.0e-4)) + \
+                         (abs(eta) > 2.4)                                                 * (0.00)}
 }
 
 ################
@@ -390,7 +396,8 @@ module Isolation MuonIsolation {
 
 module Merger MissingET {
 # add InputArray InputArray
-  add InputArray EFlowMerger/eflow
+  add InputArray Calorimeter/eflowTracks
+  add InputArray Calorimeter/eflowTowers
   set MomentumOutputArray momentum
 }
 
@@ -532,7 +539,6 @@ module TreeWriter TreeWriter {
   add Branch Calorimeter/towers Tower Tower
   add Branch Calorimeter/eflowTracks EFlowTrack Track
   add Branch Calorimeter/eflowTowers EFlowTower Tower
-  add Branch MuonMomentumSmearing/muons EFlowMuon Muon
   add Branch GenJetFinder/jets GenJet Jet
   add Branch UniqueObjectFinder/jets Jet Jet
   add Branch UniqueObjectFinder/electrons Electron Electron

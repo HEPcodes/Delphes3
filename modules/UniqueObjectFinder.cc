@@ -3,8 +3,8 @@
  *
  *  Finds uniquely identified photons, electrons and jets.
  *
- *  $Date: 2013-02-22 23:00:02 +0100 (Fri, 22 Feb 2013) $
- *  $Revision: 933 $
+ *  $Date: 2013-11-04 11:21:27 +0100 (Mon, 04 Nov 2013) $
+ *  $Revision: 1314 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -65,7 +65,7 @@ void UniqueObjectFinder::Init()
     array = ImportArray(param[i*2].GetString());
     iterator = array->MakeIterator();
 
-    fInputMap[iterator] = ExportArray(param[i*2 + 1].GetString());;
+    fInputMap[iterator] = ExportArray(param[i*2 + 1].GetString());
   }
 }
 

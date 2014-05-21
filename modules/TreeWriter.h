@@ -5,8 +5,8 @@
  *
  *  Fills ROOT tree branches.
  *
- *  $Date: 2013-05-26 02:00:39 +0200 (Sun, 26 May 2013) $
- *  $Revision: 1123 $
+ *  $Date: 2013-11-08 17:09:58 +0100 (Fri, 08 Nov 2013) $
+ *  $Revision: 1323 $
  *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
@@ -40,6 +40,7 @@ private:
   void FillParticles(Candidate *candidate, TRefArray *array);
 
   void ProcessParticles(ExRootTreeBranch *branch, TObjArray *array);
+  void ProcessVertices(ExRootTreeBranch *branch, TObjArray *array);
   void ProcessTracks(ExRootTreeBranch *branch, TObjArray *array);
   void ProcessTowers(ExRootTreeBranch *branch, TObjArray *array);
   void ProcessPhotons(ExRootTreeBranch *branch, TObjArray *array);
