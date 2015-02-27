@@ -2,6 +2,7 @@ Makefile
 tmp/
 
 libDelphes.so
+libDelphesNoFastJet.so
 
 DelphesHepMC
 DelphesLHEF
