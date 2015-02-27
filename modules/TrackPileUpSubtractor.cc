@@ -1,11 +1,25 @@
+/*
+ *  Delphes: a framework for fast simulation of a generic collider experiment
+ *  Copyright (C) 2012-2014  Universite catholique de Louvain (UCL), Belgium
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 /** \class TrackPileUpSubtractor
  *
  *  Subtract pile-up contribution from tracks.
- *
- *  $Date: 2014-01-17 14:29:22 +0100 (Fri, 17 Jan 2014) $
- *  $Revision: 1349 $
- *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
  *

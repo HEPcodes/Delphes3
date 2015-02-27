@@ -1,12 +1,26 @@
+/*
+ *  Delphes: a framework for fast simulation of a generic collider experiment
+ *  Copyright (C) 2012-2014  Universite catholique de Louvain (UCL), Belgium
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 /** \class SimpleCalorimeter
  *
  *  Fills SimpleCalorimeter towers, performs SimpleCalorimeter resolution smearing,
  *  and creates energy flow objects (tracks, photons, and neutral hadrons).
- *
- *  $Date: 2014-04-16 15:29:31 +0200 (Wed, 16 Apr 2014) $
- *  $Revision: 1364 $
- *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
  *
@@ -45,7 +59,7 @@ SimpleCalorimeter::SimpleCalorimeter() :
   fTowerTrackArray(0), fItTowerTrackArray(0)
 {
   fResolutionFormula = new DelphesFormula;
- 
+
   fTowerTrackArray = new TObjArray;
   fItTowerTrackArray = fTowerTrackArray->MakeIterator();
 }
@@ -55,7 +69,7 @@ SimpleCalorimeter::SimpleCalorimeter() :
 SimpleCalorimeter::~SimpleCalorimeter()
 {
   if(fResolutionFormula) delete fResolutionFormula;
- 
+
   if(fTowerTrackArray) delete fTowerTrackArray;
   if(fItTowerTrackArray) delete fItTowerTrackArray;
 }
@@ -121,6 +135,7 @@ void SimpleCalorimeter::Init()
     fraction = paramFractions[0].GetDouble();
     fFractionMap[param[i*2].GetInt()] = fraction;
   }
+
 /*
   TFractionMap::iterator itFractionMap;
   for(itFractionMap = fFractionMap.begin(); itFractionMap != fFractionMap.end(); ++itFractionMap)
@@ -130,7 +145,7 @@ void SimpleCalorimeter::Init()
 */
   // read resolution formulas
   fResolutionFormula->Compile(GetString("ResolutionFormula", "0"));
- 
+
   // import array with output from other modules
   fParticleInputArray = ImportArray(GetString("ParticleInputArray", "ParticlePropagator/particles"));
   fItParticleInputArray = fParticleInputArray->MakeIterator();
@@ -141,7 +156,6 @@ void SimpleCalorimeter::Init()
   // create output arrays
   fTowerOutputArray = ExportArray(GetString("TowerOutputArray", "towers"));
   fEFlowTowerOutputArray = ExportArray(GetString("EFlowTowerOutputArray", "eflowTowers"));
- 
 }
 
 //------------------------------------------------------------------------------
@@ -182,7 +196,7 @@ void SimpleCalorimeter::Process()
   fTowerHits.clear();
   fTowerFractions.clear();
   fTrackFractions.clear();
- 
+
   // loop over all particles
   fItParticleInputArray->Reset();
   number = -1;
@@ -201,7 +215,7 @@ void SimpleCalorimeter::Process()
 
     fraction = itFractionMap->second;
     fTowerFractions.push_back(fraction);
-   
+
     if(fraction < 1.0E-9) continue;
 
     // find eta bin [1, fEtaBins.size - 1]
@@ -243,9 +257,9 @@ void SimpleCalorimeter::Process()
     }
 
     fraction = itFractionMap->second;
-  
+
     fTrackFractions.push_back(fraction);
-  
+
     // find eta bin [1, fEtaBins.size - 1]
     itEtaBin = lower_bound(fEtaBins.begin(), fEtaBins.end(), trackPosition.Eta());
     if(itEtaBin == fEtaBins.begin() || itEtaBin == fEtaBins.end()) continue;
@@ -309,7 +323,7 @@ void SimpleCalorimeter::Process()
 
       fTowerEnergy = 0.0;
       fTrackEnergy = 0.0;
-      
+
       fTowerTime = 0.0;
       fTrackTime = 0.0;
      
@@ -317,7 +331,7 @@ void SimpleCalorimeter::Process()
       
       fTowerTrackHits = 0;
       fTowerPhotonHits = 0;
-      
+
       fTowerTrackArray->Clear();
     }
 
@@ -329,11 +343,11 @@ void SimpleCalorimeter::Process()
       track = static_cast<Candidate*>(fTrackInputArray->At(number));
       momentum = track->Momentum;
       position = track->Position;
- 
+
       energy = momentum.E() * fTrackFractions[number];
-      
+
       fTrackEnergy += energy;
-      
+
       fTrackTime += TMath::Sqrt(energy)*position.T();
       fTrackWeightTime += TMath::Sqrt(energy);
     
@@ -341,19 +355,19 @@ void SimpleCalorimeter::Process()
 
       continue;
     }
-   
+
     // check for photon and electron hits in current tower
     if(flags & 2) ++fTowerPhotonHits;
-    
+
     particle = static_cast<Candidate*>(fParticleInputArray->At(number));
     momentum = particle->Momentum;
     position = particle->Position;
 
     // fill current tower
     energy = momentum.E() * fTowerFractions[number];
-   
+
     fTowerEnergy += energy;
-    
+
     fTowerTime += TMath::Sqrt(energy)*position.T();
     fTowerWeightTime += TMath::Sqrt(energy);
     
@@ -377,9 +391,6 @@ void SimpleCalorimeter::FinalizeTower()
 
   sigma = fResolutionFormula->Eval(0.0, fTowerEta, 0.0, fTowerEnergy);
 
-//  energy = gRandom->Gaus(fTowerEnergy, sigma);
-//  if(energy < 0.0) energy = 0.0;
-
   energy = LogNormal(fTowerEnergy, sigma);
   time = (fTowerWeightTime < 1.0E-09 ) ? 0 : fTowerTime/fTowerWeightTime;
 
@@ -388,20 +399,17 @@ void SimpleCalorimeter::FinalizeTower()
 
   pt = energy / TMath::CosH(eta);
 
- // fTower->Position.SetXYZT(-time, 0.0, 0.0, time);
   fTower->Position.SetPtEtaPhiE(1.0, eta, phi, time);
   fTower->Momentum.SetPtEtaPhiE(pt, eta, phi, energy);
- 
+
   fTower->Edges[0] = fTowerEdges[0];
   fTower->Edges[1] = fTowerEdges[1];
   fTower->Edges[2] = fTowerEdges[2];
   fTower->Edges[3] = fTowerEdges[3];
 
-
   // fill SimpleCalorimeter towers
   if(energy > 0.0) fTowerOutputArray->Add(fTower);
 
-  
   // fill energy flow candidates
   energy -= fTrackEnergy;
   if(energy < 0.0) energy = 0.0;
@@ -416,7 +424,6 @@ void SimpleCalorimeter::FinalizeTower()
     tower->Momentum.SetPtEtaPhiE(pt, eta, phi, energy);
     fEFlowTowerOutputArray->Add(tower);
   }
-
 }
 
 //------------------------------------------------------------------------------
@@ -430,7 +437,7 @@ Double_t SimpleCalorimeter::LogNormal(Double_t mean, Double_t sigma)
     b = TMath::Sqrt(TMath::Log((1.0 + (sigma*sigma)/(mean*mean))));
     a = TMath::Log(mean) - 0.5*b*b;
 
-    return TMath::Exp(a + b*gRandom->Gaus(0, 1));
+    return TMath::Exp(a + b*gRandom->Gaus(0.0, 1.0));
   }
   else
   {

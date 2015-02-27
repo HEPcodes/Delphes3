@@ -27,7 +27,7 @@ proc dependencies {fileName firstLine {force 1} {command {}}} {
       } elseif [file exists external/$file] {
         lappend list external/$file
         set headerFiles(external/$file) 1
-	  }
+      }
     }
   }
 

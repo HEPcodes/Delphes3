@@ -1,9 +1,27 @@
+/*
+ *  Delphes: a framework for fast simulation of a generic collider experiment
+ *  Copyright (C) 2012-2014  Universite catholique de Louvain (UCL), Belgium
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
 /** \class PileUpJetID
  *
  *  CMS PileUp Jet ID Variables, based on http://cds.cern.ch/record/1581583
  *
  *  \author S. Zenz, December 2013
- *
  *
  */
 
@@ -35,7 +53,7 @@ using namespace std;
 //------------------------------------------------------------------------------
 
 PileUpJetID::PileUpJetID() :
-  fItJetInputArray(0),fTrackInputArray(0),fNeutralInputArray(0),fItVertexInputArray(0) 
+  fItJetInputArray(0),fTrackInputArray(0),fNeutralInputArray(0),fItVertexInputArray(0)
 {
 
 }
@@ -67,27 +85,25 @@ void PileUpJetID::Init()
 
   fNeutralInputArray = ImportArray(GetString("NeutralInputArray", "Calorimeter/eflowTowers"));
   fItNeutralInputArray = fNeutralInputArray->MakeIterator();
-  
+
   fVertexInputArray = ImportArray(GetString("VertexInputArray", "PileUpMerger/vertices"));
   fItVertexInputArray = fVertexInputArray->MakeIterator();
-  
+
   fZVertexResolution  = GetDouble("ZVertexResolution", 0.005)*1.0E3;
-// create output array(s)
+
+  // create output array(s)
 
   fOutputArray = ExportArray(GetString("OutputArray", "jets"));
-
 }
 
 //------------------------------------------------------------------------------
 
 void PileUpJetID::Finish()
 {
-
   if(fItJetInputArray) delete fItJetInputArray;
   if(fItTrackInputArray) delete fItTrackInputArray;
   if(fItNeutralInputArray) delete fItNeutralInputArray;
   if(fItVertexInputArray) delete fItVertexInputArray;
-
 }
 
 //------------------------------------------------------------------------------
@@ -96,19 +112,19 @@ void PileUpJetID::Process()
 {
   Candidate *candidate, *constituent;
   TLorentzVector momentum, area;
-  Double_t zvtx=0;
+  Double_t zvtx = 0.0;
 
   Candidate *trk;
 
- // find z position of primary vertex
-   
+  // find z position of primary vertex
+
   fItVertexInputArray->Reset();
   while((candidate = static_cast<Candidate*>(fItVertexInputArray->Next())))
   {
     if(!candidate->IsPU)
     {
-    zvtx = candidate->Position.Z();
-    break;
+      zvtx = candidate->Position.Z();
+      break;
     }
   }
 

@@ -1,11 +1,25 @@
+/*
+ *  Delphes: a framework for fast simulation of a generic collider experiment
+ *  Copyright (C) 2012-2014  Universite catholique de Louvain (UCL), Belgium
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 /** \class FastJetFinder
  *
  *  Finds jets using FastJet library.
- *
- *  $Date: 2014-04-17 12:28:09 +0200 (Thu, 17 Apr 2014) $
- *  $Revision: 1383 $
- *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
  *
@@ -222,10 +236,11 @@ void FastJetFinder::Process()
 {
   Candidate *candidate, *constituent;
   TLorentzVector momentum;
+
   Double_t deta, dphi, detaMax, dphiMax;
   Double_t time, weightTime, avTime;
   Int_t number;
-  Double_t rho = 0;
+  Double_t rho = 0.0;
   PseudoJet jet, area;
   vector<PseudoJet> inputList, outputList;
   ClusterSequence *sequence;
@@ -291,8 +306,8 @@ void FastJetFinder::Process()
 
     candidate = factory->NewCandidate();
 
-    time=0;
-    weightTime=0;
+    time = 0.0;
+    timeWeight = 0.0;
 
     inputList.clear();
     inputList = sequence->constituents(*itOutputList);
@@ -358,7 +373,6 @@ void FastJetFinder::Process()
       candidate->Tau[3] = nSub4(*itOutputList);
       candidate->Tau[4] = nSub5(*itOutputList);
     }
-
 
     fOutputArray->Add(candidate);
   }

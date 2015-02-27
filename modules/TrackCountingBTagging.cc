@@ -1,11 +1,25 @@
+/*
+ *  Delphes: a framework for fast simulation of a generic collider experiment
+ *  Copyright (C) 2012-2014  Universite catholique de Louvain (UCL), Belgium
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 /** \class TrackCountingBTagging
  *
  *  b-tagging algorithm based on counting tracks with large impact parameter
- *
- *  $Date: 2014-03-27 12:39:14 +0200 (Fri, 27 March 2014) $
- *  $Revision: 1099 $
- *
  *
  *  \author M. Selvaggi - UCL, Louvain-la-Neuve
  *
@@ -109,18 +123,18 @@ void TrackCountingBTagging::Process()
       tpx = trkMomentum.Px();
       tpy = trkMomentum.Py();
 
-      xd   = track->Xd;
-      yd   = track->Yd;
-      dxy  = TMath::Abs(track->Dxy);
+      xd = track->Xd;
+      yd = track->Yd;
+      dxy = TMath::Abs(track->Dxy);
       ddxy = track->SDxy;
 
       if(tpt < fPtMin) continue;
-      if(dr  > fDeltaR) continue;
+      if(dr > fDeltaR) continue;
       if(dxy > fIPmax) continue;
 
-      sign  = (jpx*xd + jpy*yd > 0.0) ? 1 : -1;
+      sign = (jpx*xd + jpy*yd > 0.0) ? 1 : -1;
 
-      ip  = sign*dxy;
+      ip = sign*dxy;
       sip = ip / TMath::Abs(ddxy);
 
       if(sip > fSigMin) count++;

@@ -1,13 +1,26 @@
+/*
+ *  Delphes: a framework for fast simulation of a generic collider experiment
+ *  Copyright (C) 2012-2014  Universite catholique de Louvain (UCL), Belgium
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /** \class PileUpMergerPythia8
  *
  *  Merges particles from pile-up sample into event
  *
- *
- *  $Date: 2013-07-04 13:03:09 +0200 (Thu, 04 Jul 2013) $
- *  $Revision: 1175 $
- *
- *
- *  \author P. Selvaggi - UCL, Louvain-la-Neuve
+ *  \author M. Selvaggi - UCL, Louvain-la-Neuve
  *
  */
 

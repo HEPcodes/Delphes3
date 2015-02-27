@@ -1,12 +1,26 @@
+/*
+ *  Delphes: a framework for fast simulation of a generic collider experiment
+ *  Copyright (C) 2012-2014  Universite catholique de Louvain (UCL), Belgium
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 /** \class Calorimeter
  *
  *  Fills calorimeter towers, performs calorimeter resolution smearing,
  *  and creates energy flow objects (tracks, photons, and neutral hadrons).
- *
- *  $Date: 2014-04-16 17:17:35 +0200 (Wed, 16 Apr 2014) $
- *  $Revision: 1369 $
- *
  *
  *  \author P. Demin - UCL, Louvain-la-Neuve
  *
@@ -127,6 +141,7 @@ void Calorimeter::Init()
 
     fFractionMap[param[i*2].GetInt()] = make_pair(ecalFraction, hcalFraction);
   }
+
 /*
   TFractionMap::iterator itFractionMap;
   for(itFractionMap = fFractionMap.begin(); itFractionMap != fFractionMap.end(); ++itFractionMap)
@@ -148,12 +163,10 @@ void Calorimeter::Init()
   // create output arrays
   fTowerOutputArray = ExportArray(GetString("TowerOutputArray", "towers"));
   fPhotonOutputArray = ExportArray(GetString("PhotonOutputArray", "photons"));
-  
+
   fEFlowTrackOutputArray = ExportArray(GetString("EFlowTrackOutputArray", "eflowTracks"));
   fEFlowPhotonOutputArray = ExportArray(GetString("EFlowPhotonOutputArray", "eflowPhotons"));
   fEFlowNeutralHadronOutputArray = ExportArray(GetString("EFlowNeutralHadronOutputArray", "eflowNeutralHadrons"));
-
-
 }
 
 //------------------------------------------------------------------------------
@@ -338,12 +351,12 @@ void Calorimeter::Process()
       fTrackECalTime = 0.0;
       fTrackHCalTime = 0.0;
 
-      fTowerECalWeightTime = 0.0; 
-      fTowerHCalWeightTime = 0.0;
-     
+      fTowerECalTimeWeight = 0.0;
+      fTowerHCalTimeWeight = 0.0;
+
       fTowerTrackHits = 0;
       fTowerPhotonHits = 0;
-      
+
       fTowerTrackArray->Clear();
     }
 
@@ -356,27 +369,27 @@ void Calorimeter::Process()
       momentum = track->Momentum;
       position = track->Position;
 
-      
+
       ecalEnergy = momentum.E() * fTrackECalFractions[number];
       hcalEnergy = momentum.E() * fTrackHCalFractions[number];
 
       fTrackECalEnergy += ecalEnergy;
       fTrackHCalEnergy += hcalEnergy;
-      
+
       fTrackECalTime += TMath::Sqrt(ecalEnergy)*position.T();
       fTrackHCalTime += TMath::Sqrt(hcalEnergy)*position.T();
-       
-      fTrackECalWeightTime += TMath::Sqrt(ecalEnergy);
-      fTrackHCalWeightTime += TMath::Sqrt(hcalEnergy);
+
+      fTrackECalTimeWeight += TMath::Sqrt(ecalEnergy);
+      fTrackHCalTimeWeight += TMath::Sqrt(hcalEnergy);
 
       fTowerTrackArray->Add(track);
 
       continue;
     }
-   
+
     // check for photon and electron hits in current tower
     if(flags & 2) ++fTowerPhotonHits;
-    
+
     particle = static_cast<Candidate*>(fParticleInputArray->At(number));
     momentum = particle->Momentum;
     position = particle->Position;
@@ -391,9 +404,9 @@ void Calorimeter::Process()
     fTowerECalTime += TMath::Sqrt(ecalEnergy)*position.T();
     fTowerHCalTime += TMath::Sqrt(hcalEnergy)*position.T();
 
-    fTowerECalWeightTime += TMath::Sqrt(ecalEnergy);
-    fTowerHCalWeightTime += TMath::Sqrt(hcalEnergy);
-    
+    fTowerECalTimeWeight += TMath::Sqrt(ecalEnergy);
+    fTowerHCalTimeWeight += TMath::Sqrt(hcalEnergy);
+
 
     fTower->AddCandidate(particle);
   }
@@ -431,7 +444,7 @@ void Calorimeter::FinalizeTower()
   hcalTime = (fTowerHCalWeightTime < 1.0E-09 ) ? 0 : fTowerHCalTime/fTowerHCalWeightTime;
 
   energy = ecalEnergy + hcalEnergy;
-  time = (TMath::Sqrt(ecalEnergy)*ecalTime + TMath::Sqrt(hcalEnergy)*hcalTime)/(TMath::Sqrt(ecalEnergy) + TMath::Sqrt(hcalEnergy)); 
+  time = (TMath::Sqrt(ecalEnergy)*ecalTime + TMath::Sqrt(hcalEnergy)*hcalTime)/(TMath::Sqrt(ecalEnergy) + TMath::Sqrt(hcalEnergy));
 
 //  eta = fTowerEta;
 //  phi = fTowerPhi;
@@ -441,7 +454,6 @@ void Calorimeter::FinalizeTower()
 
   pt = energy / TMath::CosH(eta);
 
- // fTower->Position.SetXYZT(-time, 0.0, 0.0, time);
   fTower->Position.SetPtEtaPhiE(1.0, eta, phi, time);
   fTower->Momentum.SetPtEtaPhiE(pt, eta, phi, energy);
   fTower->Eem = ecalEnergy;
@@ -452,15 +464,13 @@ void Calorimeter::FinalizeTower()
   fTower->Edges[2] = fTowerEdges[2];
   fTower->Edges[3] = fTowerEdges[3];
 
-
-  // fill calorimeter towers
   if(energy > 0.0)
   {
     if(fTowerPhotonHits > 0 && fTowerTrackHits == 0)
     {
       fPhotonOutputArray->Add(fTower);
     }
-   
+
     fTowerOutputArray->Add(fTower);
   }
 
@@ -481,8 +491,6 @@ void Calorimeter::FinalizeTower()
 
   energy = ecalEnergy + hcalEnergy;
 
-  
-  // save ECAL and/or HCAL energy excess as an energy flow tower
   if(ecalEnergy > 0.0)
   {
     // create new photon tower
@@ -492,11 +500,10 @@ void Calorimeter::FinalizeTower()
 
     tower->Momentum.SetPtEtaPhiE(pt, eta, phi, ecalEnergy);
     tower->Eem = ecalEnergy;
-    tower->Ehad = 0;
+    tower->Ehad = 0.0;
 
     fEFlowPhotonOutputArray->Add(tower);
   }
-
   if(hcalEnergy > 0.0)
   {
     // create new neutral hadron tower
@@ -505,15 +512,11 @@ void Calorimeter::FinalizeTower()
     pt = hcalEnergy / TMath::CosH(eta);
 
     tower->Momentum.SetPtEtaPhiE(pt, eta, phi, hcalEnergy);
-    tower->Eem = 0;
+    tower->Eem = 0.0;
     tower->Ehad = hcalEnergy;
 
     fEFlowNeutralHadronOutputArray->Add(tower);
   }
-
-
-
-
 }
 
 //------------------------------------------------------------------------------
@@ -527,7 +530,7 @@ Double_t Calorimeter::LogNormal(Double_t mean, Double_t sigma)
     b = TMath::Sqrt(TMath::Log((1.0 + (sigma*sigma)/(mean*mean))));
     a = TMath::Log(mean) - 0.5*b*b;
 
-    return TMath::Exp(a + b*gRandom->Gaus(0, 1));
+    return TMath::Exp(a + b*gRandom->Gaus(0.0, 1.0));
   }
   else
   {
