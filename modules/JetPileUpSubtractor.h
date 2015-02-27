@@ -32,7 +32,6 @@
 #include <deque>
 
 class TObjArray;
-class DelphesFormula;
 
 class JetPileUpSubtractor: public DelphesModule
 {

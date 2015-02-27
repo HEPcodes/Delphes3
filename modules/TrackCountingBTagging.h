@@ -32,7 +32,6 @@
 #include <map>
 
 class TObjArray;
-class DelphesFormula;
 
 class TrackCountingBTagging: public DelphesModule
 {

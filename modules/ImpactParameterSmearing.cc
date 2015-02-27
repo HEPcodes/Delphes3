@@ -95,10 +95,8 @@ void ImpactParameterSmearing::Finish()
 void ImpactParameterSmearing::Process()
 {
   Candidate *candidate, *particle, *mother;
-  Double_t xd, yd, zd, dxy, dz, sx, sy, sz, ddxy, ddz;
-  Double_t pt, eta, px, py, ang_mom;
-
- // cout<<"New event"<<endl;
+  Double_t xd, yd, zd, dxy, sx, sy, sz, ddxy;
+  Double_t pt, eta, px, py;
 
   fItInputArray->Reset();
   while((candidate = static_cast<Candidate*>(fItInputArray->Next())))
@@ -129,12 +127,9 @@ void ImpactParameterSmearing::Process()
     zd += sz;
 
     // calculate impact parameter (after-smearing)
-    ang_mom = (xd*py - yd*px);
-    dxy = ang_mom/pt;
-    dz = zd;
+    dxy = (xd*py - yd*px)/pt;
 
     ddxy = gRandom->Gaus(0.0, fFormula->Eval(pt, eta));
-    ddz = gRandom->Gaus(0,fFormula->Eval(pt, eta));
 
     // fill smeared values in candidate
     mother = candidate;

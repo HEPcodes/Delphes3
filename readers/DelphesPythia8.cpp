@@ -88,12 +88,12 @@ void ConvertInput(Long64_t eventCounter, Pythia8::Pythia *pythia,
 
   pdg = TDatabasePDG::Instance();
 
-  for(i = 0; i < pythia->event.size(); ++i)
+  for(i = 1; i < pythia->event.size(); ++i)
   {
     Pythia8::Particle &particle = pythia->event[i];
 
     pid = particle.id();
-    status = pythia->event.statusHepMC(i);
+    status = particle.statusHepMC();
     px = particle.px(); py = particle.py(); pz = particle.pz(); e = particle.e(); mass = particle.m();
     x = particle.xProd(); y = particle.yProd(); z = particle.zProd(); t = particle.tProd();
 
@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
     progressBar.Update(eventCounter, eventCounter, kTRUE);
     progressBar.Finish();
 
-    pythia->statistics();
+    pythia->stat();
 
     modularDelphes->FinishTask();
     treeWriter->Write();

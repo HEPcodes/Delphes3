@@ -61,11 +61,17 @@ private:
 
   Double_t fTowerTime;
   Double_t fTrackTime;
-   
-  Double_t fTowerWeightTime;
-  Double_t fTrackWeightTime;
-  
+
+  Double_t fTowerTimeWeight;
+  Double_t fTrackTimeWeight;
+
   Int_t fTowerTrackHits, fTowerPhotonHits;
+
+  Double_t fEnergyMin;
+
+  Double_t fEnergySignificanceMin;
+
+  Bool_t fSmearTowerCenter;
 
   TFractionMap fFractionMap; //!
   TBinMap fBinMap; //!

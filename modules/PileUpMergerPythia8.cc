@@ -101,7 +101,7 @@ void PileUpMergerPythia8::Process()
 {
   TDatabasePDG *pdg = TDatabasePDG::Instance();
   TParticlePDG *pdgParticle;
-  Int_t pid;
+  Int_t pid, status;
   Float_t x, y, z, t;
   Float_t px, py, pz, e;
   Double_t dz, dphi;
@@ -126,11 +126,13 @@ void PileUpMergerPythia8::Process()
     dz = gRandom->Gaus(0.0, fZVertexSpread);
     dphi = gRandom->Uniform(-TMath::Pi(), TMath::Pi());
 
-    for(i = 0; i < fPythia->event.size(); ++i)
+    for(i = 1; i < fPythia->event.size(); ++i)
     {
       Pythia8::Particle &particle = fPythia->event[i];
 
-      if(particle.status() != 1 || !particle.isVisible() || particle.pT() <= fPTMin) continue;
+      status = particle.statusHepMC();
+
+      if(status != 1 || !particle.isVisible() || particle.pT() <= fPTMin) continue;
 
       pid = particle.id();
       px = particle.px(); py = particle.py(); pz = particle.pz(); e = particle.e();
@@ -140,7 +142,7 @@ void PileUpMergerPythia8::Process()
 
       candidate->PID = pid;
 
-      candidate->Status = 1;
+      candidate->Status = status;
 
       pdgParticle = pdg->GetParticle(pid);
       candidate->Charge = pdgParticle ? Int_t(pdgParticle->Charge()/3.0) : -999;

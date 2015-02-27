@@ -119,8 +119,8 @@ void ParticlePropagator::Process()
   Double_t t_z, t_r, t_ra, t_rb;
   Double_t tmp, discr, discr2;
   Double_t delta, gammam, omega, asinrho;
-  Double_t ang_mom, rcu, rc2, dxy, xd, yd, zd;
-  
+  Double_t rcu, rc2, dxy, xd, yd, zd;
+
   const Double_t c_light = 2.99792458E8;
 
   fItInputArray->Reset();
@@ -239,10 +239,8 @@ void ParticlePropagator::Process()
       zd = z + (TMath::Sqrt(xd*xd + yd*yd) - TMath::Sqrt(x*x + y*y))*pz/pt;
 
       // calculate impact paramater
-      ang_mom = (xd*py - yd*px);
-      dxy = ang_mom/pt;
-    
-         
+      dxy = (xd*py - yd*px)/pt;
+
       // 3. time evaluation t = TMath::Min(t_r, t_z)
       //    t_r : time to exit from the sides
       //    t_z : time to exit from the front or the back
@@ -296,6 +294,7 @@ void ParticlePropagator::Process()
         candidate->Position.SetXYZT(x_t*1.0E3, y_t*1.0E3, z_t*1.0E3, candidatePosition.T() + t*c_light*1.0E3);
 
         candidate->Momentum = candidateMomentum;
+        candidate->Dxy = dxy*1.0E3;
         candidate->Xd = xd*1.0E3;
         candidate->Yd = yd*1.0E3;
         candidate->Zd = zd*1.0E3;

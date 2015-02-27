@@ -5,6 +5,7 @@ set suffix " \\\n\t"
 
 set srcSuf {.$(SrcSuf)}
 set objSuf {.$(ObjSuf)}
+set pcmSuf {$(PcmSuf)}
 set exeSuf {$(ExeSuf)}
 
 proc dependencies {fileName firstLine {force 1} {command {}}} {
@@ -51,11 +52,11 @@ proc dependencies {fileName firstLine {force 1} {command {}}} {
   close $fid
 }
 
-proc dictDeps {dictVar args} {
+proc dictDeps {dictPrefix args} {
 
-  global prefix suffix srcSuf objSuf
+  global prefix suffix srcSuf objSuf pcmSuf
 
-  set dict [eval glob -nocomplain $args]
+  set dict [lsort [eval glob -nocomplain $args]]
 
   set dictSrcFiles {}
   set dictObjFiles {}
@@ -66,27 +67,33 @@ proc dictDeps {dictVar args} {
 
     lappend dictSrcFiles $dictName$srcSuf
     lappend dictObjFiles $dictName$objSuf
+    lappend dictPcmFiles [file tail $dictName$pcmSuf]
 
     dependencies $fileName "$dictName$srcSuf:$suffix$fileName"
+
+    puts -nonewline [file tail $dictName$pcmSuf]:$suffix
+    puts -nonewline $dictName$pcmSuf$suffix
+    puts -nonewline $dictName$srcSuf
+    puts {}
   }
 
-  puts -nonewline "${dictVar} += $suffix"
-  puts [join $dictSrcFiles $suffix]
-  puts {}
-
-  puts -nonewline "${dictVar}_OBJ += $suffix"
+  puts -nonewline "${dictPrefix}_OBJ += $suffix"
   puts [join $dictObjFiles $suffix]
   puts {}
 
+  puts -nonewline "${dictPrefix}_PCM += $suffix"
+  puts [join $dictPcmFiles $suffix]
+  puts {}
 }
 
 proc sourceDeps {srcPrefix args} {
 
   global prefix suffix srcSuf objSuf
 
-  set source [eval glob -nocomplain $args]
+  set source [lsort [eval glob -nocomplain $args]]
 
   set srcObjFiles {}
+  set srcObjFilesFastJet {}
   set srcObjFilesPythia8 {}
 
   foreach fileName $source {
@@ -95,6 +102,8 @@ proc sourceDeps {srcPrefix args} {
 
     if {$fileName == "modules/PileUpMergerPythia8.cc"} {
       lappend srcObjFilesPythia8 $srcObjName$objSuf
+    } elseif {[string match {modules/FastJet*.cc} $fileName] && $srcPrefix != {FASTJET}} {
+      continue
     } else {
       lappend srcObjFiles $srcObjName$objSuf
     }
@@ -117,7 +126,7 @@ proc tclDeps {} {
 
   global prefix suffix srcSuf objSuf
 
-  set source [glob -nocomplain {external/tcl/*.c}]
+  set source [lsort [glob -nocomplain {external/tcl/*.c}]]
 
   set srcObjFiles {}
 
@@ -141,7 +150,7 @@ proc executableDeps {args} {
 
   global prefix suffix objSuf exeSuf
 
-  set executable [eval glob -nocomplain $args]
+  set executable [lsort [eval glob -nocomplain $args]]
 
   set exeFiles {}
 
@@ -190,48 +199,48 @@ puts {
 
 include doc/Makefile.arch
 
-ifeq ($(ARCH),macosx64)
-UNDEFOPT = dynamic_lookup
-endif
+ROOT_MAJOR := $(shell $(RC) --version | cut -d'.' -f1)
 
 SrcSuf = cc
+PcmSuf = _rdict.pcm
 
 CXXFLAGS += $(ROOTCFLAGS) -Wno-write-strings -D_FILE_OFFSET_BITS=64 -DDROP_CGAL -I. -Iexternal -Iexternal/tcl
 DELPHES_LIBS = $(shell $(RC) --libs) -lEG $(SYSLIBS)
-DISPLAY_LIBS = $(shell $(RC) --evelibs) $(SYSLIBS)
+DISPLAY_LIBS = $(shell $(RC) --evelibs) -lGuiHtml  $(SYSLIBS)
 
 ifneq ($(CMSSW_FWLITE_INCLUDE_PATH),)
 HAS_CMSSW = true
 CXXFLAGS += -std=c++0x -I$(subst :, -I,$(CMSSW_FWLITE_INCLUDE_PATH))
-DELPHES_LIBS += -L$(subst include,lib,$(subst :, -L,$(CMSSW_FWLITE_INCLUDE_PATH)))
+OPT_LIBS += -L$(subst include,lib,$(subst :, -L,$(CMSSW_FWLITE_INCLUDE_PATH)))
 ifneq ($(CMSSW_RELEASE_BASE),)
 CXXFLAGS += -I$(CMSSW_RELEASE_BASE)/src
 endif
 ifneq ($(LD_LIBRARY_PATH),)
-DELPHES_LIBS += -L$(subst include,lib,$(subst :, -L,$(LD_LIBRARY_PATH)))
+OPT_LIBS += -L$(subst include,lib,$(subst :, -L,$(LD_LIBRARY_PATH)))
 endif
-DELPHES_LIBS += -lGenVector -lFWCoreFWLite -lDataFormatsFWLite -lDataFormatsPatCandidates -lDataFormatsLuminosity -lCommonToolsUtils
+OPT_LIBS += -lGenVector -lFWCoreFWLite -lDataFormatsFWLite -lDataFormatsPatCandidates -lDataFormatsLuminosity -lSimDataFormatsGeneratorProducts -lCommonToolsUtils
 endif
 
 ifneq ($(PROMC),)
 HAS_PROMC = true
-CXXFLAGS += -I$(PROMC)/include
-DELPHES_LIBS += -L$(PROMC)/lib -lprotoc -lprotobuf -lprotobuf-lite -lcbook -lz
+CXXFLAGS += -I$(PROMC)/include -I$(PROMC)/src
+OPT_LIBS += -L$(PROMC)/lib -lpromc -lprotoc -lprotobuf -lprotobuf-lite -lcbook -lz
 endif
 
 ifneq ($(PYTHIA8),)
-HAS_PYTHIA8 = true
+#HAS_PYTHIA8 = true
 CXXFLAGS += -I$(PYTHIA8)/include
-DELPHES_LIBS += -L$(PYTHIA8)/lib -lpythia8 -lLHAPDF -lgfortran -lz
-else
-ifneq ($(PYTHIA8DATA),)
-HAS_PYTHIA8 = true
-CXXFLAGS += -I$(PYTHIA8DATA)/../include
-DELPHES_LIBS += -L$(PYTHIA8DATA)/../lib -lpythia8 -lLHAPDF -lgfortran -lz
-endif
+CXXFLAGS += -I$(PYTHIA8)/include/Pythia8
+OPT_LIBS += -L$(PYTHIA8)/lib -lpythia8 -ldl
 endif
 
+DELPHES_LIBS += $(OPT_LIBS)
+DISPLAY_LIBS += $(OPT_LIBS)
+
 ###
+
+NOFASTJET = libDelphesNoFastJet.$(DllSuf)
+NOFASTJETLIB = libDelphesNoFastJet.lib
 
 DELPHES = libDelphes.$(DllSuf)
 DELPHESLIB = libDelphes.lib
@@ -258,7 +267,6 @@ puts {}
 
 puts {ifeq ($(HAS_PROMC),true)}
 executableDeps {readers/DelphesProMC.cpp}
-sourceDeps {DELPHES} {external/ProMC/*.cc}
 puts {endif}
 puts {}
 
@@ -270,9 +278,13 @@ puts {}
 
 dictDeps {DELPHES_DICT} {classes/ClassesLinkDef.h} {modules/ModulesLinkDef.h} {external/ExRootAnalysis/ExRootAnalysisLinkDef.h}
 
+dictDeps {FASTJET_DICT} {modules/FastJetLinkDef.h}
+
 dictDeps {DISPLAY_DICT} {display/DisplayLinkDef.h}
 
-sourceDeps {DELPHES} {classes/*.cc} {modules/*.cc} {external/ExRootAnalysis/*.cc} {external/fastjet/*.cc} {external/fastjet/tools/*.cc} {external/fastjet/plugins/*/*.cc} {external/fastjet/contribs/*/*.cc} {external/Hector/*.cc}
+sourceDeps {DELPHES} {classes/*.cc} {modules/*.cc} {external/ExRootAnalysis/*.cc} {external/Hector/*.cc}
+
+sourceDeps {FASTJET} {modules/FastJet*.cc} {external/fastjet/*.cc} {external/fastjet/tools/*.cc} {external/fastjet/plugins/*/*.cc} {external/fastjet/contribs/*/*.cc} 
 
 sourceDeps {DISPLAY} {display/*.cc}
 
@@ -284,11 +296,42 @@ puts {
 
 ###
 
-all: $(DELPHES) $(EXECUTABLE)
-
+ifeq ($(ROOT_MAJOR),6)
+all: $(NOFASTJET) $(DELPHES) $(DELPHES_DICT_PCM) $(FASTJET_DICT_PCM) $(EXECUTABLE)
+display: $(DISPLAY) $(DISPLAY_DICT_PCM)
+else
+all: $(NOFASTJET) $(DELPHES) $(EXECUTABLE)
 display: $(DISPLAY)
+endif
 
-$(DELPHES): $(DELPHES_DICT_OBJ) $(DELPHES_OBJ) $(TCL_OBJ)
+$(NOFASTJET): $(DELPHES_DICT_OBJ) $(DELPHES_OBJ) $(TCL_OBJ)
+	@mkdir -p $(@D)
+	@echo ">> Building $@"
+ifeq ($(ARCH),aix5)
+	@$(MAKESHARED) $(OutPutOpt) $@ $(DELPHES_LIBS) -p 0 $^
+else
+ifeq ($(PLATFORM),macosx)
+# We need to make both the .dylib and the .so
+	@$(LD) $(SOFLAGS)$@ $(LDFLAGS) $^ $(OutPutOpt) $@ $(DELPHES_LIBS)
+ifneq ($(subst $(MACOSX_MINOR),,1234),1234)
+ifeq ($(MACOSX_MINOR),4)
+	@ln -sf $@ $(subst .$(DllSuf),.so,$@)
+endif
+endif
+else
+ifeq ($(PLATFORM),win32)
+	@bindexplib $* $^ > $*.def
+	@lib -nologo -MACHINE:IX86 $^ -def:$*.def $(OutPutOpt)$(NOFASTJETLIB)
+	@$(LD) $(SOFLAGS) $(LDFLAGS) $^ $*.exp $(DELPHES_LIBS) $(OutPutOpt)$@
+	@$(MT_DLL)
+else
+	@$(LD) $(SOFLAGS) $(LDFLAGS) $^ $(OutPutOpt) $@ $(DELPHES_LIBS)
+	@$(MT_DLL)
+endif
+endif
+endif
+
+$(DELPHES): $(DELPHES_DICT_OBJ) $(FASTJET_DICT_OBJ) $(DELPHES_OBJ) $(FASTJET_OBJ) $(TCL_OBJ)
 	@mkdir -p $(@D)
 	@echo ">> Building $@"
 ifeq ($(ARCH),aix5)
@@ -315,7 +358,7 @@ endif
 endif
 endif
 
-$(DISPLAY): $(DELPHES_DICT_OBJ) $(DISPLAY_DICT_OBJ) $(DELPHES_OBJ) $(DISPLAY_OBJ) $(TCL_OBJ)
+$(DISPLAY): $(DELPHES_DICT_OBJ) $(FASTJET_DICT_OBJ) $(DISPLAY_DICT_OBJ) $(DELPHES_OBJ) $(FASTJET_OBJ) $(DISPLAY_OBJ) $(TCL_OBJ)
 	@mkdir -p $(@D)
 	@echo ">> Building $@"
 ifeq ($(ARCH),aix5)
@@ -343,23 +386,23 @@ endif
 endif
 
 clean:
-	@rm -f $(DELPHES_DICT_OBJ) $(DISPLAY_DICT_OBJ) $(DELPHES_OBJ) $(DISPLAY_OBJ) $(TCL_OBJ) core
+	@rm -f $(DELPHES_DICT_OBJ) $(DISPLAY_DICT_OBJ) $(DELPHES_OBJ) $(FASTJET_OBJ) $(DISPLAY_OBJ) $(TCL_OBJ) core
 	@rm -rf tmp
 
 distclean: clean
-	@rm -f $(DELPHES) $(DELPHESLIB) $(DISPLAY) $(DISPLAYLIB) $(EXECUTABLE)
+	@rm -f $(NOFASTJET) $(NOFASTJETLIB) $(DELPHES) $(DELPHESLIB) $(DELPHES_DICT_PCM) $(FASTJET_DICT_PCM) $(DISPLAY) $(DISPLAYLIB) $(DISPLAY_DICT_PCM) $(EXECUTABLE)
 
 dist:
 	@echo ">> Building $(DISTTAR)"
 	@mkdir -p $(DISTDIR)
-	@cp -a CHANGELOG CREDITS README VERSION Makefile configure classes converters display doc examples external modules python readers $(DISTDIR)
+	@cp -a CHANGELOG COPYING CREDITS README VERSION Makefile configure cards classes converters display doc examples external modules python readers $(DISTDIR)
 	@find $(DISTDIR) -depth -name .\* -exec rm -rf {} \;
 	@tar -czf $(DISTTAR) $(DISTDIR)
 	@rm -rf $(DISTDIR)
 
 ###
 
-.SUFFIXES: .$(SrcSuf) .$(ObjSuf) .$(DllSuf)
+.SUFFIXES: .$(SrcSuf) .$(ObjSuf) .$(DllSuf) $(PcmSuf)
 
 %Dict.$(SrcSuf):
 	@mkdir -p $(@D)
@@ -371,7 +414,16 @@ dist:
 	@cat $@.arch $< $@.base > $@
 	@rm $@.arch $@.base
 
+%Dict$(PcmSuf):
+	@echo ">> Copying $@"
+	@cp $< $@
+
 $(DELPHES_OBJ): tmp/%.$(ObjSuf): %.$(SrcSuf)
+	@mkdir -p $(@D)
+	@echo ">> Compiling $<"
+	@$(CXX) $(CXXFLAGS) -c $< $(OutPutOpt)$@
+
+$(FASTJET_OBJ): tmp/%.$(ObjSuf): %.$(SrcSuf)
 	@mkdir -p $(@D)
 	@echo ">> Compiling $<"
 	@$(CXX) $(CXXFLAGS) -c $< $(OutPutOpt)$@
@@ -386,6 +438,11 @@ $(DELPHES_DICT_OBJ): %.$(ObjSuf): %.$(SrcSuf)
 	@echo ">> Compiling $<"
 	@$(CXX) $(CXXFLAGS) -c $< $(OutPutOpt)$@
 
+$(FASTJET_DICT_OBJ): %.$(ObjSuf): %.$(SrcSuf)
+	@mkdir -p $(@D)
+	@echo ">> Compiling $<"
+	@$(CXX) $(CXXFLAGS) -c $< $(OutPutOpt)$@
+
 $(DISPLAY_DICT_OBJ): %.$(ObjSuf): %.$(SrcSuf)
 	@mkdir -p $(@D)
 	@echo ">> Compiling $<"
@@ -394,14 +451,14 @@ $(DISPLAY_DICT_OBJ): %.$(ObjSuf): %.$(SrcSuf)
 $(TCL_OBJ): tmp/%.$(ObjSuf): %.c
 	@mkdir -p $(@D)
 	@echo ">> Compiling $<"
-	@gcc $(CXXFLAGS) -c $< $(OutPutOpt)$@
+	@$(CC) $(patsubst -std=%,,$(CXXFLAGS)) -c $< $(OutPutOpt)$@
 
 $(EXECUTABLE_OBJ): tmp/%.$(ObjSuf): %.cpp
 	@mkdir -p $(@D)
 	@echo ">> Compiling $<"
 	@$(CXX) $(CXXFLAGS) -c $< $(OutPutOpt)$@
 
-$(EXECUTABLE): %$(ExeSuf): $(DELPHES_DICT_OBJ) $(DELPHES_OBJ) $(TCL_OBJ)
+$(EXECUTABLE): %$(ExeSuf): $(DELPHES_DICT_OBJ) $(FASTJET_DICT_OBJ) $(DELPHES_OBJ) $(FASTJET_OBJ) $(TCL_OBJ)
 	@echo ">> Building $@"
 	@$(LD) $(LDFLAGS) $^ $(DELPHES_LIBS) $(OutPutOpt)$@
 

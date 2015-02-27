@@ -33,7 +33,6 @@
 #include <deque>
 
 class TObjArray;
-class DelphesFormula;
 
 class PileUpJetID: public DelphesModule
 {
@@ -62,11 +61,11 @@ private:
 
   const TObjArray *fJetInputArray; //!
 
-  const TObjArray *fTrackInputArray; // SCZ
-  const TObjArray *fNeutralInputArray; 
+  const TObjArray *fTrackInputArray; //!
+  const TObjArray *fNeutralInputArray; //!
 
-  TIterator *fItTrackInputArray; // SCZ
-  TIterator *fItNeutralInputArray; // SCZ
+  TIterator *fItTrackInputArray; //!
+  TIterator *fItNeutralInputArray; //!
 
   TObjArray *fOutputArray; //!
 

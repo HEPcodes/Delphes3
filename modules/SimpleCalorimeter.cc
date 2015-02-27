@@ -143,6 +143,15 @@ void SimpleCalorimeter::Init()
     cout << itFractionMap->first << "   " << itFractionMap->second.first  << "   " << itFractionMap->second.second << endl;
   }
 */
+
+  // read min E value for towers to be saved
+  fEnergyMin = GetDouble("EnergyMin", 0.0);
+
+  fEnergySignificanceMin = GetDouble("EnergySignificanceMin", 0.0);
+
+  // switch on or off the dithering of the center of calorimeter towers
+  fSmearTowerCenter = GetBool("SmearTowerCenter", true);
+
   // read resolution formulas
   fResolutionFormula->Compile(GetString("ResolutionFormula", "0"));
 
@@ -326,9 +335,9 @@ void SimpleCalorimeter::Process()
 
       fTowerTime = 0.0;
       fTrackTime = 0.0;
-     
-      fTowerWeightTime = 0.0; 
-      
+
+      fTowerTimeWeight = 0.0;
+
       fTowerTrackHits = 0;
       fTowerPhotonHits = 0;
 
@@ -349,8 +358,8 @@ void SimpleCalorimeter::Process()
       fTrackEnergy += energy;
 
       fTrackTime += TMath::Sqrt(energy)*position.T();
-      fTrackWeightTime += TMath::Sqrt(energy);
-    
+      fTrackTimeWeight += TMath::Sqrt(energy);
+
       fTowerTrackArray->Add(track);
 
       continue;
@@ -369,8 +378,8 @@ void SimpleCalorimeter::Process()
     fTowerEnergy += energy;
 
     fTowerTime += TMath::Sqrt(energy)*position.T();
-    fTowerWeightTime += TMath::Sqrt(energy);
-    
+    fTowerTimeWeight += TMath::Sqrt(energy);
+
     fTower->AddCandidate(particle);
   }
 
@@ -392,10 +401,23 @@ void SimpleCalorimeter::FinalizeTower()
   sigma = fResolutionFormula->Eval(0.0, fTowerEta, 0.0, fTowerEnergy);
 
   energy = LogNormal(fTowerEnergy, sigma);
-  time = (fTowerWeightTime < 1.0E-09 ) ? 0 : fTowerTime/fTowerWeightTime;
 
-  eta = gRandom->Uniform(fTowerEdges[0], fTowerEdges[1]);
-  phi = gRandom->Uniform(fTowerEdges[2], fTowerEdges[3]);
+  time = (fTowerTimeWeight < 1.0E-09 ) ? 0.0 : fTowerTime/fTowerTimeWeight;
+
+  sigma = fResolutionFormula->Eval(0.0, fTowerEta, 0.0, energy);
+
+  if(energy < fEnergyMin || energy < fEnergySignificanceMin*sigma) energy = 0.0;
+
+  if(fSmearTowerCenter)
+  {
+    eta = gRandom->Uniform(fTowerEdges[0], fTowerEdges[1]);
+    phi = gRandom->Uniform(fTowerEdges[2], fTowerEdges[3]);
+  }
+  else
+  {
+    eta = fTowerEta;
+    phi = fTowerPhi;
+  }
 
   pt = energy / TMath::CosH(eta);
 
@@ -412,8 +434,11 @@ void SimpleCalorimeter::FinalizeTower()
 
   // fill energy flow candidates
   energy -= fTrackEnergy;
-  if(energy < 0.0) energy = 0.0;
-   
+
+  sigma = fResolutionFormula->Eval(0.0, fTowerEta, 0.0, energy);
+
+  if(energy < fEnergyMin || energy < fEnergySignificanceMin*sigma) energy = 0.0;
+
   // save energy excess as an energy flow tower
   if(energy > 0.0)
   {

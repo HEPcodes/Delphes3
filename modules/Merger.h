@@ -34,7 +34,6 @@
 
 class TIterator;
 class TObjArray;
-class DelphesFormula;
 
 class Merger: public DelphesModule
 {

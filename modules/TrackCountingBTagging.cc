@@ -64,12 +64,12 @@ void TrackCountingBTagging::Init()
 {
   fBitNumber = GetInt("BitNumber", 0);
 
-  fPtMin     = GetDouble("TrackPtMin", 1.0);
-  fDeltaR    = GetDouble("DeltaR", 0.3);
-  fIPmax     = GetDouble("TrackIPMax", 2.0);
+  fPtMin = GetDouble("TrackPtMin", 1.0);
+  fDeltaR = GetDouble("DeltaR", 0.3);
+  fIPmax = GetDouble("TrackIPMax", 2.0);
 
-  fSigMin    = GetDouble("SigMin", 6.5);
-  fNtracks   = GetInt("Ntracks", 3);
+  fSigMin = GetDouble("SigMin", 6.5);
+  fNtracks = GetInt("Ntracks", 3);
 
   // import input array(s)
 
