@@ -2,7 +2,7 @@
 #define __CMS_ITERATIVE_CONE__SORT_BY_ET_H__
 
 //STARTHEADER
-// $Id: SortByEt.h 859 2012-11-28 01:49:23Z pavel $
+// $Id$
 //
 // Copyright (c) ????-????, CMS collaboration
 // Copyright (c) 2009-2011, Matteo Cacciari, Gavin P. Salam and Gregory Soyez [for the changes listed below]

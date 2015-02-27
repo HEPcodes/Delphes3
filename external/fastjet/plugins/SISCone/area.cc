@@ -21,8 +21,8 @@
 // along with this program; if not, write to the Free Software               //
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA //
 //                                                                           //
-// $Revision:: 859                                                          $//
-// $Date:: 2012-11-28 02:49:23 +0100 (Wed, 28 Nov 2012)                     $//
+// $Revision:: 149                                                          $//
+// $Date:: 2007-03-15 00:13:58 +0100 (Thu, 15 Mar 2007)                     $//
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "area.h"
