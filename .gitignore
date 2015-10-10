@@ -14,3 +14,8 @@ stdhep2pileup
 hepmc2pileup
 root2pileup
 pileup2root
+
+/ClassesDict_rdict.pcm
+/ModulesDict_rdict.pcm
+/FastJetDict_rdict.pcm
+/ExRootAnalysisDict_rdict.pcm
