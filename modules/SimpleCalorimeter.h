@@ -1,3 +1,4 @@
+
 /*
  *  Delphes: a framework for fast simulation of a generic collider experiment
  *  Copyright (C) 2012-2014  Universite catholique de Louvain (UCL), Belgium
@@ -57,7 +58,7 @@ private:
   Candidate *fTower;
   Double_t fTowerEta, fTowerPhi, fTowerEdges[4];
   Double_t fTowerEnergy;
-  Double_t fTrackEnergy;
+  Double_t fTrackEnergy[2];
 
   Double_t fTowerTime;
   Double_t fTrackTime;
@@ -72,6 +73,8 @@ private:
   Double_t fEnergySignificanceMin;
 
   Bool_t fSmearTowerCenter;
+
+  Bool_t fIsEcal; //!
 
   TFractionMap fFractionMap; //!
   TBinMap fBinMap; //!
@@ -95,10 +98,11 @@ private:
 
   TObjArray *fTowerOutputArray; //!
 
+  TObjArray *fEFlowTrackOutputArray; //!
   TObjArray *fEFlowTowerOutputArray; //!
 
-  TObjArray *fTowerTrackArray; //!
-  TIterator *fItTowerTrackArray; //!
+  TObjArray *fTowerTrackArray[2]; //!
+  TIterator *fItTowerTrackArray[2]; //!
 
   void FinalizeTower();
   Double_t LogNormal(Double_t mean, Double_t sigma);

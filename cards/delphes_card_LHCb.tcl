@@ -7,11 +7,12 @@
 #######################################
 
 set ExecutionPath {
-
+  
+  PhotonConversions
   ParticlePropagator
 
   ChargedHadronMomentumSmearing
-  ElectronEnergySmearing
+  ElectronMomentumSmearing
   MuonMomentumSmearing
 
   TrackMerger
@@ -27,12 +28,49 @@ set ExecutionPath {
 
 
 
+#####################
+# Photon Conversions
+#####################
+
+module PhotonConversions PhotonConversions {
+  set InputArray Delphes/stableParticles
+
+  set OutputArray stableParticles
+  
+  # radius of the magnetic field coverage, in m
+ 
+  set Radius 3.31
+   
+  set HalfLength 12.0
+ 
+  set EtaMin 2.0
+  set EtaMax 5.0
+ 
+  
+  # material budget map: (uniform for now)
+  # distribution of the detector mass ( density / X0), can be thought as 
+  # conversion rate per meter function of r,phi,z 
+ 
+ 
+  # unit: m-1
+  
+  set Step 0.05
+  
+  set ConversionMap {          (abs(z) > 0.0 && abs(z) < 12.0 ) * (0.07) +
+                               (abs(z) > 0.0) * (0.00) +
+			       (abs(z) < 0.0) * (0.00)
+		    }
+
+}
+
+
+
 #################################
 # Propagate particles in cylinder
 #################################
 
 module ParticlePropagator ParticlePropagator {
-  set InputArray Delphes/stableParticles
+  set InputArray PhotonConversions/stableParticles
 
   set OutputArray stableParticles
   set ChargedHadronOutputArray chargedHadrons
@@ -72,20 +110,19 @@ module MomentumSmearing ChargedHadronMomentumSmearing {
   set ResolutionFormula {(eta > 2.0  && eta <= 5.0)      * (pt > 0.5) * (0.005)}
 }
 
-#################################
-# Energy resolution for electrons
-#################################
+###################################
+# Momentum resolution for electrons
+###################################
 
-module EnergySmearing ElectronEnergySmearing {
+module MomentumSmearing ElectronMomentumSmearing {
   set InputArray ParticlePropagator/electrons
   set OutputArray electrons
 
   # set ResolutionFormula {resolution formula as a function of eta and energy}
 
   # resolution formula for electrons
-  set ResolutionFormula { (eta > 2.0  && eta <= 5.0) * (energy > 0.1   && energy <= 8.0) * (energy*0.05) +
-                          (eta > 2.0  && eta <= 5.0) * (energy > 8.0)                    *  sqrt(energy^2*0.015^2 + energy*0.10^2)}
-  }
+  set ResolutionFormula {(eta > 2.0  && eta <= 5.0)      * (pt > 0.5)* (0.005)}
+}
 
 ###############################
 # Momentum resolution for muons
@@ -107,7 +144,7 @@ module MomentumSmearing MuonMomentumSmearing {
 module Merger TrackMerger {
 # add InputArray InputArray
   add InputArray ChargedHadronMomentumSmearing/chargedHadrons
-  add InputArray ElectronEnergySmearing/electrons
+  add InputArray ElectronMomentumSmearing/electrons
   add InputArray MuonMomentumSmearing/muons
   set OutputArray tracks
 }
@@ -199,6 +236,16 @@ module IdentificationMap IdentificationMap {
                                            (eta > 2.0  && eta <= 5.0) *     (pt >= 0.8)* (0.97) +
                                            (eta > 5.0)                                 * (0.00)}
 
+# --- electrons ---
+
+
+
+  add EfficiencyFormula {-11} {-11} {      (eta <= 2.0)                                * (0.00) +
+                                           (eta > 2.0  && eta <= 5.0) *      (pt < 0.6)* (0.97) +
+                                           (eta > 2.0  && eta <= 5.0) *     (pt >= 0.6)* (0.97) +
+                                           (eta > 5.0)                                 * (0.00)}
+
+
 
  # efficiency for other charged particles (should be always {0} {0} {formula})
 
@@ -221,7 +268,10 @@ module SimpleCalorimeter ECal {
   set TrackInputArray IdentificationMap/tracks
 
   set TowerOutputArray ecalTowers
+  set EFlowTrackOutputArray eflowTracks
   set EFlowTowerOutputArray eflowPhotons
+
+  set IsEcal true
 
   set EnergyMin 0.0
   set EnergySignificanceMin 0.0
@@ -298,10 +348,13 @@ module SimpleCalorimeter ECal {
 
 module SimpleCalorimeter HCal {
   set ParticleInputArray ParticlePropagator/stableParticles
-  set TrackInputArray IdentificationMap/tracks
+  set TrackInputArray ECal/eflowTracks
 
   set TowerOutputArray hcalTowers
+  set EFlowTrackOutputArray eflowTracks
   set EFlowTowerOutputArray eflowNeutralHadrons
+
+  set IsEcal false 
 
   set EnergyMin 0.0
   set EnergySignificanceMin 0.0
@@ -377,7 +430,7 @@ module TreeWriter TreeWriter {
 
   add Branch Delphes/allParticles Particle GenParticle
 
-  add Branch IdentificationMap/tracks Track Track
+  add Branch HCal/eflowTracks Track Track
   add Branch HCal/eflowNeutralHadrons NeutralHadron Tower
   add Branch ECal/eflowPhotons Photon Photon
 

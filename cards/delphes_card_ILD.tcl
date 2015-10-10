@@ -1,3 +1,5 @@
+# based on arXiv:1306.6329
+
 #######################################
 # Order of execution of various modules
 #######################################
@@ -10,7 +12,7 @@ set ExecutionPath {
   MuonTrackingEfficiency
 
   ChargedHadronMomentumSmearing
-  ElectronEnergySmearing
+  ElectronMomentumSmearing
   MuonMomentumSmearing
 
   TrackMerger
@@ -19,6 +21,8 @@ set ExecutionPath {
 
   ECal
   HCal
+
+  ElectronFilter
 
   TowerMerger
   EFlowMerger
@@ -52,12 +56,12 @@ module ParticlePropagator ParticlePropagator {
   set MuonOutputArray muons
 
   # radius of the magnetic field coverage, in m
-  set Radius 2.60
+  set Radius 1.8
   # half-length of the magnetic field coverage, in m
-  set HalfLength 6.00
+  set HalfLength 2.4
 
   # magnetic field
-  set Bz 6.0
+  set Bz 3.5
 }
 
 ####################################
@@ -72,12 +76,8 @@ module Efficiency ChargedHadronTrackingEfficiency {
 
   # tracking efficiency formula for charged hadrons
   set EfficiencyFormula {                                                    (pt <= 0.1)   * (0.00) +
-                                           (abs(eta) <= 1.5) * (pt > 0.1   && pt <= 1.0)   * (0.75) +
-                                           (abs(eta) <= 1.5) * (pt > 1.0)                  * (0.95) +
-                         (abs(eta) > 1.5 && abs(eta) <= 4.0) * (pt > 0.1   && pt <= 1.0)   * (0.60) +
-                         (abs(eta) > 1.5 && abs(eta) <= 4.0) * (pt > 1.0)                  * (0.90) +
-                         (abs(eta) > 4.0)                                                  * (0.00)}
-
+                                           (abs(eta) <= 2.4)               * (pt > 0.1)    * (0.99) +
+                                           (abs(eta) >  2.4)                               * (0.00)}
 }
 
 ##############################
@@ -92,11 +92,8 @@ module Efficiency ElectronTrackingEfficiency {
 
   # tracking efficiency formula for electrons
   set EfficiencyFormula {                                                    (pt <= 0.1)   * (0.00) +
-                                           (abs(eta) <= 1.5) * (pt > 0.1   && pt <= 1.0)   * (0.75) +
-                                           (abs(eta) <= 1.5) * (pt > 1.0)                  * (0.99) +
-                         (abs(eta) > 1.5 && abs(eta) <= 4.0) * (pt > 0.1   && pt <= 1.0)   * (0.70) +
-                         (abs(eta) > 1.5 && abs(eta) <= 4.0) * (pt > 1.0)                  * (0.98) +
-                         (abs(eta) > 4.0)                                                  * (0.00)}
+                                           (abs(eta) <= 2.4)               * (pt > 0.1)    * (0.99) +
+                                           (abs(eta) >  2.4)                               * (0.00)}
 }
 
 ##########################
@@ -111,11 +108,8 @@ module Efficiency MuonTrackingEfficiency {
 
   # tracking efficiency formula for muons
   set EfficiencyFormula {                                                    (pt <= 0.1)   * (0.00) +
-                                           (abs(eta) <= 1.5) * (pt > 0.1   && pt <= 1.0)   * (0.75) +
-                                           (abs(eta) <= 1.5) * (pt > 1.0)                  * (0.99) +
-                         (abs(eta) > 1.5 && abs(eta) <= 4.0) * (pt > 0.1   && pt <= 1.0)   * (0.70) +
-                         (abs(eta) > 1.5 && abs(eta) <= 4.0) * (pt > 1.0)                  * (0.98) +
-                         (abs(eta) > 4.0)                                                  * (0.00)}
+                                           (abs(eta) <= 2.4)               * (pt > 0.1)    * (0.99) +
+                                           (abs(eta) >  2.4)                               * (0.00)}
 }
 
 ########################################
@@ -129,27 +123,25 @@ module MomentumSmearing ChargedHadronMomentumSmearing {
   # set ResolutionFormula {resolution formula as a function of eta and pt}
 
   # resolution formula for charged hadrons
-  set ResolutionFormula {    (abs(eta) <= 1.5)                   * (pt > 0.1) * (0.01 + pt*2.e-5) +
-                             (abs(eta) > 1.5 && abs(eta) <= 4.0) * (pt > 0.1) * (0.02 + pt*3.e-5)}
+  set ResolutionFormula {    (abs(eta) <= 1.0)                   * sqrt(0.001^2 + pt^2*1.e-5^2) +
+                             (abs(eta) > 1.0 && abs(eta) <= 2.4) * sqrt(0.01^2 + pt^2*1.e-4^2)}
 
 
 }
 
-#################################
-# Energy resolution for electrons
-#################################
+###################################
+# Momentum resolution for electrons
+###################################
 
-module EnergySmearing ElectronEnergySmearing {
+module MomentumSmearing ElectronMomentumSmearing {
   set InputArray ElectronTrackingEfficiency/electrons
   set OutputArray electrons
 
   # set ResolutionFormula {resolution formula as a function of eta and energy}
 
-  # resolution formula for electrons
-  set ResolutionFormula {                  (abs(eta) <= 4.0) * (energy > 0.1   && energy <= 2.0e1) * (energy*0.007) +
-                                           (abs(eta) <= 4.0) * (energy > 2.0e1)                    * sqrt(energy^2*0.005^2 + energy*0.02^2) +
-                                           (abs(eta) > 4.0 && abs(eta) <= 6.0)                     * sqrt(energy^2*0.05^2 + energy*1.00^2)}
-
+   # resolution formula for charged hadrons
+  set ResolutionFormula {    (abs(eta) <= 1.0)                   * sqrt(0.001^2 + pt^2*1.e-5^2) +
+                             (abs(eta) > 1.0 && abs(eta) <= 2.4) * sqrt(0.01^2 + pt^2*1.e-4^2)}
 }
 
 ###############################
@@ -162,10 +154,9 @@ module MomentumSmearing MuonMomentumSmearing {
 
   # set ResolutionFormula {resolution formula as a function of eta and pt}
 
-  # resolution formula for muons
-  set ResolutionFormula {    (abs(eta) <= 1.5)                   * (pt > 0.1) * (0.01 + pt*5.e-6) +
-                             (abs(eta) > 1.5 && abs(eta) <= 4.0) * (pt > 0.1) * (0.02 + pt*1.e-5)}
-
+   # resolution formula for charged hadrons
+  set ResolutionFormula {    (abs(eta) <= 1.0)                   * sqrt(0.001^2 + pt^2*1.e-5^2) +
+                             (abs(eta) > 1.0 && abs(eta) <= 2.4) * sqrt(0.01^2 + pt^2*1.e-4^2)}
 
 }
 
@@ -176,15 +167,15 @@ module MomentumSmearing MuonMomentumSmearing {
 module Merger TrackMerger {
 # add InputArray InputArray
   add InputArray ChargedHadronMomentumSmearing/chargedHadrons
-  add InputArray ElectronEnergySmearing/electrons
+  add InputArray ElectronMomentumSmearing/electrons
   add InputArray MuonMomentumSmearing/muons
   set OutputArray tracks
 }
 
 
-################################
+########################
 # Track angular smearing
-################################
+########################
 
 module AngularSmearing AngularSmearing {
   set InputArray TrackMerger/tracks
@@ -199,9 +190,9 @@ module AngularSmearing AngularSmearing {
 
 }
 
-################################
+#################################
 # Track impact parameter smearing
-################################
+#################################
 
 module ImpactParameterSmearing ImpactParameterSmearing {
   set InputArray AngularSmearing/tracks
@@ -223,8 +214,11 @@ module SimpleCalorimeter ECal {
   set TrackInputArray ImpactParameterSmearing/tracks
 
   set TowerOutputArray ecalTowers
+  set EFlowTrackOutputArray eflowTracks
   set EFlowTowerOutputArray eflowPhotons
 
+  set IsEcal true 
+ 
   set EnergyMin 0.5
   set EnergySignificanceMin 1.0
 
@@ -236,15 +230,15 @@ module SimpleCalorimeter ECal {
   # each list starts with the lower edge of the first tower
   # the list ends with the higher edged of the last tower
 
-  # 0.5 degree towers
+  # 0.5 degree towers (5x5 mm^2)
   set PhiBins {}
   for {set i -360} {$i <= 360} {incr i} {
     add PhiBins [expr {$i * $pi/360.0}]
   }
 
-  # 0.01 unit in eta up to eta = 3
-  for {set i -300} {$i <= 300} {incr i} {
-    set eta [expr {$i * 0.01}]
+  # 0.01 unit in eta up to eta = 2.5
+  for {set i -500} {$i <= 500} {incr i} {
+    set eta [expr {$i * 0.005}]
     add EtaPhiBins $eta $PhiBins
   }
 
@@ -271,10 +265,7 @@ module SimpleCalorimeter ECal {
 
   # set ECalResolutionFormula {resolution formula as a function of eta and energy}
 
-  # This is the CMS ECAL resolution, extended up eta = 6.0
-  set ResolutionFormula { (abs(eta) <= 3.0)                   * sqrt(energy^2*0.003^2 + energy*0.029^2 + 0.125^2)  +
-                 	  (abs(eta) > 3.0 && abs(eta) <= 5.0) * sqrt(energy^2*0.107^2 + energy*2.08^2)}
-
+  set ResolutionFormula { (abs(eta) <= 3.0)                   * sqrt(energy^2*0.01^2 + energy*0.15^2) }
 
 }
 
@@ -284,11 +275,14 @@ module SimpleCalorimeter ECal {
 
 module SimpleCalorimeter HCal {
   set ParticleInputArray ParticlePropagator/stableParticles
-  set TrackInputArray ImpactParameterSmearing/tracks
+  set TrackInputArray ECal/eflowTracks
 
   set TowerOutputArray hcalTowers
+  set EFlowTrackOutputArray eflowTracks
   set EFlowTowerOutputArray eflowNeutralHadrons
 
+  set IsEcal false 
+ 
   set EnergyMin 1.0
   set EnergySignificanceMin 1.0
 
@@ -301,13 +295,13 @@ module SimpleCalorimeter HCal {
   # the list ends with the higher edged of the last tower
 
 
-  # 5 degree towers
+  # 6 degree towers
   set PhiBins {}
-  for {set i -72} {$i <= 72} {incr i} {
-    add PhiBins [expr {$i * $pi/75.0}]
+  for {set i -60} {$i <= 60} {incr i} {
+    add PhiBins [expr {$i * $pi/60.0}]
   }
 
-  # 0.05 unit in eta up to eta = 3
+  # 0.5 unit in eta up to eta = 3
   for {set i -60} {$i <= 60} {incr i} {
     set eta [expr {$i * 0.05}]
     add EtaPhiBins $eta $PhiBins
@@ -336,16 +330,25 @@ module SimpleCalorimeter HCal {
 
   # set HCalResolutionFormula {resolution formula as a function of eta and energy}
 
-  # This is the ATLAS HCAL resolution, extended up eta = 6.0
-  set HCalResolutionFormula {                  (abs(eta) <= 1.7) * sqrt(energy^2*0.0302^2 + energy*0.5205^2 + 1.59^2) +
-                             (abs(eta) > 1.7 && abs(eta) <= 3.2) * sqrt(energy^2*0.0500^2 + energy*0.706^2) +
-                             (abs(eta) > 3.2 && abs(eta) <= 6.0) * sqrt(energy^2*0.09420^2 + energy*1.00^2)}
+  set ResolutionFormula {                  (abs(eta) <= 3.0) * sqrt(energy^2*0.015^2 + energy*0.50^2)}
 
 }
 
-####################
+#################
+# Electron filter
+#################
+
+module PdgCodeFilter ElectronFilter {
+  set InputArray HCal/eflowTracks
+  set OutputArray electrons
+  set Invert true
+  add PdgCode {11}
+  add PdgCode {-11}
+}
+
+###################################################
 # Tower Merger (in case not using e-flow algorithm)
-####################
+###################################################
 
 module Merger TowerMerger {
 # add InputArray InputArray
@@ -360,7 +363,7 @@ module Merger TowerMerger {
 
 module Merger EFlowMerger {
 # add InputArray InputArray
-  add InputArray ImpactParameterSmearing/tracks
+  add InputArray HCal/eflowTracks
   add InputArray ECal/eflowPhotons
   add InputArray HCal/eflowNeutralHadrons
   set OutputArray eflow
@@ -388,9 +391,9 @@ module Merger ScalarHT {
   set EnergyOutputArray energy
 }
 
-#####################
+#################
 # Neutrino Filter
-#####################
+#################
 
 module PdgCodeFilter NeutrinoFilter {
 
@@ -422,7 +425,7 @@ module FastJetFinder GenJetFinder {
   set JetAlgorithm 6
   set ParameterR 0.5
 
-  set JetPTMin 100.0
+  set JetPTMin 20.0
 }
 
 ############
@@ -430,7 +433,7 @@ module FastJetFinder GenJetFinder {
 ############
 
 module FastJetFinder FastJetFinder {
-#  set InputArray Calorimeter/towers
+#  set InputArray TowerMerger/towers
   set InputArray EFlowMerger/eflow
 
   set OutputArray jets
@@ -439,7 +442,7 @@ module FastJetFinder FastJetFinder {
   set JetAlgorithm 6
   set ParameterR 0.5
 
-  set JetPTMin 100.0
+  set JetPTMin 20.0
 }
 
 ##################
@@ -481,9 +484,9 @@ module TrackCountingBTagging TrackCountingBTagging {
 }
 
 
-##########################
+#############
 # tau-tagging
-##########################
+#############
 
 
 module TauTagging TauTagging {
@@ -518,9 +521,10 @@ module TreeWriter TreeWriter {
   add Branch HCal/eflowNeutralHadrons NeutralHadron Tower
   add Branch ECal/eflowPhotons Photon Photon
 
-  add Branch ElectronEnergySmearing/electrons Electron Electron
+  add Branch ElectronFilter/electrons Electron Electron
   add Branch MuonMomentumSmearing/muons Muon Muon
   add Branch JetEnergyScale/jets Jet Jet
   add Branch MissingET/momentum MissingET MissingET
   add Branch ScalarHT/energy ScalarHT ScalarHT
 }
+

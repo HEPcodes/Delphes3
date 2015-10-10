@@ -102,7 +102,7 @@ proc sourceDeps {srcPrefix args} {
 
     if {$fileName == "modules/PileUpMergerPythia8.cc"} {
       lappend srcObjFilesPythia8 $srcObjName$objSuf
-    } elseif {[string match {modules/FastJet*.cc} $fileName] && $srcPrefix != {FASTJET}} {
+    } elseif {([string match {modules/FastJet*.cc} $fileName] || [string match {modules/RunPUPPI.cc} $fileName]) && $srcPrefix != {FASTJET}} {
       continue
     } else {
       lappend srcObjFiles $srcObjName$objSuf
@@ -218,7 +218,7 @@ endif
 ifneq ($(LD_LIBRARY_PATH),)
 OPT_LIBS += -L$(subst include,lib,$(subst :, -L,$(LD_LIBRARY_PATH)))
 endif
-OPT_LIBS += -lGenVector -lFWCoreFWLite -lDataFormatsFWLite -lDataFormatsPatCandidates -lDataFormatsLuminosity -lSimDataFormatsGeneratorProducts -lCommonToolsUtils
+OPT_LIBS += -lGenVector -lFWCoreFWLite -lDataFormatsFWLite -lDataFormatsCommon -lDataFormatsPatCandidates -lDataFormatsLuminosity -lSimDataFormatsGeneratorProducts -lCommonToolsUtils -lDataFormatsCommon
 endif
 
 ifneq ($(PROMC),)
@@ -284,7 +284,7 @@ dictDeps {DISPLAY_DICT} {display/DisplayLinkDef.h}
 
 sourceDeps {DELPHES} {classes/*.cc} {modules/*.cc} {external/ExRootAnalysis/*.cc} {external/Hector/*.cc}
 
-sourceDeps {FASTJET} {modules/FastJet*.cc} {external/fastjet/*.cc} {external/fastjet/tools/*.cc} {external/fastjet/plugins/*/*.cc} {external/fastjet/contribs/*/*.cc} 
+sourceDeps {FASTJET} {modules/FastJet*.cc} {modules/RunPUPPI.cc} {external/PUPPI/*.cc} {external/fastjet/*.cc} {external/fastjet/tools/*.cc} {external/fastjet/plugins/*/*.cc} {external/fastjet/contribs/*/*.cc} 
 
 sourceDeps {DISPLAY} {display/*.cc}
 
@@ -395,7 +395,7 @@ distclean: clean
 dist:
 	@echo ">> Building $(DISTTAR)"
 	@mkdir -p $(DISTDIR)
-	@cp -a CHANGELOG COPYING CREDITS README VERSION Makefile configure cards classes converters display doc examples external modules python readers $(DISTDIR)
+	@cp -a CHANGELOG CMakeLists.txt COPYING CREDITS DelphesEnv.sh README README_4LHCb VERSION Makefile MinBias.pileup configure cards classes converters display doc examples external modules python readers $(DISTDIR)
 	@find $(DISTDIR) -depth -name .\* -exec rm -rf {} \;
 	@tar -czf $(DISTTAR) $(DISTDIR)
 	@rm -rf $(DISTDIR)

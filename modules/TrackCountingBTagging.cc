@@ -125,7 +125,7 @@ void TrackCountingBTagging::Process()
 
       xd = track->Xd;
       yd = track->Yd;
-      dxy = TMath::Abs(track->Dxy);
+      dxy = TMath::Hypot(xd, yd);
       ddxy = track->SDxy;
 
       if(tpt < fPtMin) continue;

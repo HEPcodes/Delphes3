@@ -56,14 +56,11 @@ private:
 
   Candidate *fTower;
   Double_t fTowerEta, fTowerPhi, fTowerEdges[4];
-  Double_t fTowerECalEnergy, fTowerHCalEnergy;
-  Double_t fTrackECalEnergy, fTrackHCalEnergy;
+  Double_t fECalTowerEnergy, fHCalTowerEnergy;
+  Double_t fECalTrackEnergy[2], fHCalTrackEnergy[2];
 
-  Double_t fTowerECalTime, fTowerHCalTime;
-  Double_t fTrackECalTime, fTrackHCalTime;
-
-  Double_t fTowerECalTimeWeight, fTowerHCalTimeWeight;
-  Double_t fTrackECalTimeWeight, fTrackHCalTimeWeight;
+  Double_t fTimingEnergyMin;
+  Bool_t fElectronsFromTrack;
 
   Int_t fTowerTrackHits, fTowerPhotonHits;
 
@@ -83,11 +80,11 @@ private:
 
   std::vector < Long64_t > fTowerHits;
 
-  std::vector < Double_t > fTowerECalFractions;
-  std::vector < Double_t > fTowerHCalFractions;
+  std::vector < Double_t > fECalTowerFractions;
+  std::vector < Double_t > fHCalTowerFractions;
 
-  std::vector < Double_t > fTrackECalFractions;
-  std::vector < Double_t > fTrackHCalFractions;
+  std::vector < Double_t > fECalTrackFractions;
+  std::vector < Double_t > fHCalTrackFractions;
 
   DelphesFormula *fECalResolutionFormula; //!
   DelphesFormula *fHCalResolutionFormula; //!
@@ -105,8 +102,11 @@ private:
   TObjArray *fEFlowPhotonOutputArray; //!
   TObjArray *fEFlowNeutralHadronOutputArray; //!
 
-  TObjArray *fTowerTrackArray; //!
-  TIterator *fItTowerTrackArray; //!
+  TObjArray *fECalTowerTrackArray[2]; //!
+  TIterator *fItECalTowerTrackArray[2]; //!
+
+  TObjArray *fHCalTowerTrackArray[2]; //!
+  TIterator *fItHCalTowerTrackArray[2]; //!
 
   void FinalizeTower();
   Double_t LogNormal(Double_t mean, Double_t sigma);
